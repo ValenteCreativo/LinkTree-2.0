@@ -25,10 +25,9 @@ const categories: Category[] = [
     items: [
       { url: "https://aura-tau-five.vercel.app", label: "Aura" },
       { url: "https://arvi-eight.vercel.app", label: "Arvi" },
-      { url: "https://seedr-three.vercel.app", label: "Seedr" },
-      { url: "https://rembu-app.vercel.app", label: "Rembu" },
       { url: "https://aona.vercel.app", label: "Aona" },
       { url: "https://sen-network1.vercel.app", label: "SEN Network" },
+      { url: "https://rembu-app.vercel.app", label: "Rembu" },
     ],
   },
   {
@@ -38,6 +37,7 @@ const categories: Category[] = [
     color: "from-blue-500/20 to-blue-900/10",
     items: [
       { url: "https://care-pilot-nu.vercel.app", label: "CarePilot" },
+      { url: "https://seedr-three.vercel.app", label: "Seedr" },
       { url: "https://www.side-b.art", label: "Side-B" },
       { url: "https://sigilo-zeta.vercel.app", label: "Sigilo" },
       { url: "https://supply-cycle.vercel.app", label: "Supply Cycle" },
@@ -93,6 +93,17 @@ const categories: Category[] = [
 ];
 
 function getScreenshotUrl(url: string): string {
+  // Manual fallback for pages that don't render well in headless browsers
+  const manualScreenshots: Record<string, string> = {
+    "https://care-pilot-nu.vercel.app": "/care-pilot-screenshot.png",
+    "https://arvi-eight.vercel.app": "/arvi-screenshot.png",
+    "https://aura-tau-five.vercel.app": "/aura-screenshot.png",
+  };
+
+  // Check if we have a manual screenshot for this URL
+  const match = Object.keys(manualScreenshots).find((key) => url.startsWith(key));
+  if (match) return manualScreenshots[match];
+
   return `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url`;
 }
 

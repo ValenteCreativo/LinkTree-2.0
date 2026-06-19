@@ -33,6 +33,7 @@ const profile = {
   title: "Valentín Martínez",
   banner: "Technology Developer for Social & Environmental Impact",
   links: [
+    { title: "Blog Literario", url: "https://valentinmartinezmx.wixsite.com/ideas/blog" },
     { title: "GitHub", url: "https://github.com/ValenteCreativo" },
     { title: "Blog Técnico", url: "https://medium.com/@geovalente" },
     { title: "Programación Creativa", url: "https://codepen.io/ValenteCreativo" },
