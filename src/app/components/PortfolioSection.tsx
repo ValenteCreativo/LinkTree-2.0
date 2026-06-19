@@ -37,7 +37,7 @@ const categories: Category[] = [
     emoji: "🤝",
     color: "from-blue-500/20 to-blue-900/10",
     items: [
-      { url: "https://carepilot-tau.vercel.app", label: "CarePilot" },
+      { url: "https://care-pilot-nu.vercel.app", label: "CarePilot" },
       { url: "https://www.side-b.art", label: "Side-B" },
       { url: "https://sigilo-zeta.vercel.app", label: "Sigilo" },
       { url: "https://supply-cycle.vercel.app", label: "Supply Cycle" },
@@ -54,6 +54,7 @@ const categories: Category[] = [
       { url: "https://rizoma-shipyard-ynwq.vercel.app", label: "Rizoma" },
       { url: "https://rls-jerusalem-336.vercel.app/public", label: "RLS Jerusalem" },
       { url: "https://patrimo.pro", label: "Patrimo" },
+      { url: "https://www.patas4land.xyz", label: "Patas4Land" },
     ],
   },
   {
@@ -65,6 +66,8 @@ const categories: Category[] = [
       { url: "https://instalacion-dimensiones.vercel.app", label: "Dimensiones" },
       { url: "https://kinetic-poiesis.vercel.app", label: "Kinetic Poiesis" },
       { url: "https://audioreactive-visualizer.vercel.app", label: "Audioreactive" },
+      { url: "https://quantum-looper.netlify.app", label: "Quantum Looper" },
+      { url: "https://circulo-de-quintas-one.vercel.app", label: "Círculo de Quintas" },
     ],
   },
   {
@@ -76,17 +79,6 @@ const categories: Category[] = [
       { url: "https://la-reta.vercel.app", label: "La Reta" },
       { url: "https://guardabosques.vercel.app", label: "Guardabosques" },
       { url: "https://mariachi-vs-inflation.vercel.app", label: "Mariachi vs Inflation" },
-    ],
-  },
-  {
-    id: "experimento",
-    label: "Experimentos",
-    emoji: "🧪",
-    color: "from-cyan-500/20 to-cyan-900/10",
-    items: [
-      { url: "https://www.patas4land.xyz", label: "Patas4Land" },
-      { url: "https://quantum-looper.netlify.app", label: "Quantum Looper" },
-      { url: "https://circulo-de-quintas-one.vercel.app", label: "Círculo de Quintas" },
     ],
   },
   {
@@ -150,9 +142,9 @@ export default function PortfolioSection() {
             className="space-y-2"
           >
             {/* Category header */}
-            <h3 className="text-xs font-medium text-gray-400 px-1">
+            <h3 className="text-sm font-semibold text-gray-300 px-1">
               {category.emoji} {category.label}
-              <span className="text-gray-600 ml-2">({category.items.length})</span>
+              <span className="text-gray-600 ml-2 text-xs font-normal">({category.items.length})</span>
             </h3>
 
             {/* Horizontal scroll row */}

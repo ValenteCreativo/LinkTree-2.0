@@ -76,19 +76,25 @@ export default function Home() {
       {/* 3D Universe Background */}
       <PortalScene zoom={scrollProgress} />
 
-      {/* Background Image Layer */}
+      {/* Background Image Layer — subtle zoom + fade */}
       <div
-        className="fixed top-0 left-0 w-full h-full z-[5] transition-all duration-200 pointer-events-none"
+        className="fixed top-0 left-0 w-full h-full z-[5] pointer-events-none transition-opacity duration-700 ease-out"
         style={{
-          transform: `scale(${1 + scrollProgress * 0.5})`,
-          opacity: 1 - scrollProgress,
+          opacity: Math.max(0, 1 - scrollProgress * 1.8),
         }}
       >
-        <img
-          src="/BG-linktree (1).png"
-          alt="Background"
-          className="w-full h-full object-cover"
-        />
+        <div
+          className="w-full h-full transition-transform duration-700 ease-out"
+          style={{
+            transform: `scale(${1 + scrollProgress * 0.15})`,
+          }}
+        >
+          <img
+            src="/BG-linktree (1).png"
+            alt="Background"
+            className="w-full h-full object-cover"
+          />
+        </div>
       </div>
 
       {/* Scroll indicator arrow */}
@@ -122,7 +128,7 @@ export default function Home() {
                   <div className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-green-500 to-blue-500 opacity-50 blur-[2px]" />
                   <img
                     loading="lazy"
-                    className="relative rounded-full w-24 h-24 object-cover"
+                    className="relative rounded-full w-32 h-32 object-cover object-center scale-125"
                     src={profile.avatar}
                     alt={profile.title}
                   />

@@ -24,16 +24,17 @@ const UniverseScene: React.FC<UniverseSceneProps> = ({ zoom }) => {
     if (!mountRef.current) return;
     const currentMount = mountRef.current;
 
+    // === SCENE ===
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x000005, 0.00035);
+    scene.fog = new THREE.FogExp2(0x000008, 0.00025);
 
     const camera = new THREE.PerspectiveCamera(
-      65,
+      60,
       window.innerWidth / window.innerHeight,
       0.1,
-      8000
+      10000
     );
-    camera.position.set(0, 50, 500);
+    camera.position.set(0, 80, 500);
     camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -43,19 +44,19 @@ const UniverseScene: React.FC<UniverseSceneProps> = ({ zoom }) => {
     renderer.toneMappingExposure = 1.0;
     currentMount.appendChild(renderer.domElement);
 
-    // Post-processing — minimal bloom, no blur
+    // === POST-PROCESSING (sharp, no blur) ===
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
 
     const bloomPass = new UnrealBloomPass(
       new THREE.Vector2(window.innerWidth, window.innerHeight),
-      0.6,
-      0.1,
-      0.9
+      0.8,
+      0.15,
+      0.85
     );
-    bloomPass.threshold = 0.4;
-    bloomPass.strength = 0.5;
-    bloomPass.radius = 0.2;
+    bloomPass.threshold = 0.3;
+    bloomPass.strength = 0.6;
+    bloomPass.radius = 0.25;
     composer.addPass(bloomPass);
 
     const fxaaPass = new ShaderPass(FXAAShader);
@@ -65,8 +66,16 @@ const UniverseScene: React.FC<UniverseSceneProps> = ({ zoom }) => {
     );
     composer.addPass(fxaaPass);
 
-    // === STARFIELD — crisp dots ===
-    const createStarLayer = (count: number, spread: number, size: number, color: number) => {
+    // =============================================
+    // STARFIELD — massive, layered, realistic
+    // =============================================
+    const createStarLayer = (
+      count: number,
+      spread: number,
+      size: number,
+      color: number,
+      opacity: number
+    ) => {
       const geo = new THREE.BufferGeometry();
       const positions = new Float32Array(count * 3);
       for (let i = 0; i < count; i++) {
@@ -80,41 +89,47 @@ const UniverseScene: React.FC<UniverseSceneProps> = ({ zoom }) => {
         size,
         sizeAttenuation: true,
         transparent: true,
-        opacity: 1.0,
+        opacity,
         blending: THREE.AdditiveBlending,
       });
       return new THREE.Points(geo, mat);
     };
 
-    const starLayer1 = createStarLayer(10000, 3000, 0.8, 0xffffff);
-    const starLayer2 = createStarLayer(4000, 4000, 1.2, 0xccddff);
-    const starLayer3 = createStarLayer(1500, 5000, 1.8, 0xffeedd);
-    scene.add(starLayer1, starLayer2, starLayer3);
+    // Dense background stars (tiny, white)
+    const starsDeep = createStarLayer(15000, 5000, 0.6, 0xffffff, 0.7);
+    // Mid-field stars (slight blue tint)
+    const starsMid = createStarLayer(6000, 3500, 1.0, 0xddeeff, 0.85);
+    // Foreground bright stars (warm)
+    const starsNear = createStarLayer(2000, 2000, 1.6, 0xfff8ee, 1.0);
+    // Colored accent stars
+    const starsBlue = createStarLayer(800, 4000, 2.0, 0x6699ff, 0.6);
+    const starsOrange = createStarLayer(500, 4000, 1.8, 0xffaa44, 0.5);
+    scene.add(starsDeep, starsMid, starsNear, starsBlue, starsOrange);
 
-    // === NEBULA — subtle, not overwhelming ===
-    const createNebulaCloud = (
-      color1: string,
-      color2: string,
+    // =============================================
+    // NEBULAE — multiple, subtle, volumetric feel
+    // =============================================
+    const createNebula = (
+      colors: { stop: number; color: string }[],
       size: number,
-      position: THREE.Vector3
+      position: THREE.Vector3,
+      opacity: number
     ) => {
       const canvas = document.createElement("canvas");
-      canvas.width = 256;
-      canvas.height = 256;
+      canvas.width = 512;
+      canvas.height = 512;
       const ctx = canvas.getContext("2d")!;
-      const gradient = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
-      gradient.addColorStop(0, color1);
-      gradient.addColorStop(0.5, color2);
-      gradient.addColorStop(1, "rgba(0,0,0,0)");
+      const gradient = ctx.createRadialGradient(256, 256, 0, 256, 256, 256);
+      colors.forEach((c) => gradient.addColorStop(c.stop, c.color));
       ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, 256, 256);
+      ctx.fillRect(0, 0, 512, 512);
 
       const texture = new THREE.CanvasTexture(canvas);
       const material = new THREE.SpriteMaterial({
         map: texture,
         blending: THREE.AdditiveBlending,
         transparent: true,
-        opacity: 0.15,
+        opacity,
       });
       const sprite = new THREE.Sprite(material);
       sprite.scale.set(size, size, 1);
@@ -123,30 +138,108 @@ const UniverseScene: React.FC<UniverseSceneProps> = ({ zoom }) => {
     };
 
     const nebulaGroup = new THREE.Group();
-    const nebulaConfigs = [
-      { c1: "rgba(0,180,100,0.3)", c2: "rgba(0,60,30,0.1)", size: 350, pos: new THREE.Vector3(-500, 100, -700) },
-      { c1: "rgba(50,100,200,0.25)", c2: "rgba(20,40,80,0.08)", size: 400, pos: new THREE.Vector3(400, -150, -800) },
-      { c1: "rgba(100,60,180,0.2)", c2: "rgba(40,20,70,0.06)", size: 300, pos: new THREE.Vector3(0, 250, -900) },
-    ];
-    nebulaConfigs.forEach((n) => {
-      nebulaGroup.add(createNebulaCloud(n.c1, n.c2, n.size, n.pos));
-    });
+
+    // Large blue/purple nebula — background
+    nebulaGroup.add(
+      createNebula(
+        [
+          { stop: 0, color: "rgba(60,80,180,0.5)" },
+          { stop: 0.3, color: "rgba(30,20,80,0.3)" },
+          { stop: 0.7, color: "rgba(10,5,30,0.1)" },
+          { stop: 1, color: "rgba(0,0,0,0)" },
+        ],
+        600,
+        new THREE.Vector3(-400, 150, -1200),
+        0.2
+      )
+    );
+    // Green/teal emission nebula
+    nebulaGroup.add(
+      createNebula(
+        [
+          { stop: 0, color: "rgba(0,200,120,0.4)" },
+          { stop: 0.4, color: "rgba(0,80,60,0.2)" },
+          { stop: 1, color: "rgba(0,0,0,0)" },
+        ],
+        450,
+        new THREE.Vector3(500, -100, -1000),
+        0.15
+      )
+    );
+    // Pink/magenta nebula
+    nebulaGroup.add(
+      createNebula(
+        [
+          { stop: 0, color: "rgba(200,50,120,0.35)" },
+          { stop: 0.5, color: "rgba(80,10,40,0.15)" },
+          { stop: 1, color: "rgba(0,0,0,0)" },
+        ],
+        500,
+        new THREE.Vector3(0, 300, -1500),
+        0.12
+      )
+    );
+    // Gold dust cloud
+    nebulaGroup.add(
+      createNebula(
+        [
+          { stop: 0, color: "rgba(255,200,50,0.3)" },
+          { stop: 0.5, color: "rgba(120,60,0,0.1)" },
+          { stop: 1, color: "rgba(0,0,0,0)" },
+        ],
+        350,
+        new THREE.Vector3(-300, -250, -800),
+        0.1
+      )
+    );
+    // Small cyan wisp
+    nebulaGroup.add(
+      createNebula(
+        [
+          { stop: 0, color: "rgba(0,220,255,0.4)" },
+          { stop: 0.6, color: "rgba(0,60,100,0.1)" },
+          { stop: 1, color: "rgba(0,0,0,0)" },
+        ],
+        250,
+        new THREE.Vector3(350, 200, -600),
+        0.18
+      )
+    );
+    // Distant red cloud
+    nebulaGroup.add(
+      createNebula(
+        [
+          { stop: 0, color: "rgba(180,30,30,0.25)" },
+          { stop: 0.5, color: "rgba(60,5,5,0.1)" },
+          { stop: 1, color: "rgba(0,0,0,0)" },
+        ],
+        700,
+        new THREE.Vector3(200, -200, -2000),
+        0.08
+      )
+    );
+
     scene.add(nebulaGroup);
 
-    // === SPIRAL GALAXY ===
-    const createGalaxy = () => {
-      const count = 20000;
-      const radius = 300;
-      const branches = 5;
-      const spin = 1.5;
-      const randomness = 0.25;
-      const randomnessPower = 3;
-      const insideColor = new THREE.Color(0xffffff);
-      const outsideColor = new THREE.Color(0x4488ff);
-
+    // =============================================
+    // SPIRAL GALAXY — large, detailed
+    // =============================================
+    const createGalaxy = (
+      count: number,
+      radius: number,
+      branches: number,
+      spin: number,
+      colorInside: THREE.Color,
+      colorOutside: THREE.Color,
+      position: THREE.Vector3,
+      rotationX: number,
+      rotationZ: number
+    ) => {
       const geometry = new THREE.BufferGeometry();
       const positions = new Float32Array(count * 3);
       const colors = new Float32Array(count * 3);
+      const randomnessPower = 3;
+      const randomness = 0.3;
 
       for (let i = 0; i < count; i++) {
         const i3 = i * 3;
@@ -154,22 +247,16 @@ const UniverseScene: React.FC<UniverseSceneProps> = ({ zoom }) => {
         const branchAngle = ((i % branches) / branches) * Math.PI * 2;
         const spinAngle = r * spin;
 
-        const randomX =
-          Math.pow(Math.random(), randomnessPower) *
-          (Math.random() < 0.5 ? 1 : -1) * randomness * r;
-        const randomY =
-          Math.pow(Math.random(), randomnessPower) *
-          (Math.random() < 0.5 ? 1 : -1) * randomness * r * 0.2;
-        const randomZ =
-          Math.pow(Math.random(), randomnessPower) *
-          (Math.random() < 0.5 ? 1 : -1) * randomness * r;
+        const rx = Math.pow(Math.random(), randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * randomness * r;
+        const ry = Math.pow(Math.random(), randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * randomness * r * 0.15;
+        const rz = Math.pow(Math.random(), randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * randomness * r;
 
-        positions[i3] = Math.cos(branchAngle + spinAngle) * r + randomX;
-        positions[i3 + 1] = randomY;
-        positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * r + randomZ;
+        positions[i3] = Math.cos(branchAngle + spinAngle) * r + rx;
+        positions[i3 + 1] = ry;
+        positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * r + rz;
 
-        const mixedColor = insideColor.clone();
-        mixedColor.lerp(outsideColor, r / radius);
+        const mixedColor = colorInside.clone();
+        mixedColor.lerp(colorOutside, r / radius);
         colors[i3] = mixedColor.r;
         colors[i3 + 1] = mixedColor.g;
         colors[i3 + 2] = mixedColor.b;
@@ -179,7 +266,7 @@ const UniverseScene: React.FC<UniverseSceneProps> = ({ zoom }) => {
       geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
 
       const material = new THREE.PointsMaterial({
-        size: 0.9,
+        size: 1.0,
         vertexColors: true,
         sizeAttenuation: true,
         blending: THREE.AdditiveBlending,
@@ -187,65 +274,223 @@ const UniverseScene: React.FC<UniverseSceneProps> = ({ zoom }) => {
         opacity: 0.85,
       });
 
-      return new THREE.Points(geometry, material);
+      const galaxy = new THREE.Points(geometry, material);
+      galaxy.position.copy(position);
+      galaxy.rotation.x = rotationX;
+      galaxy.rotation.z = rotationZ;
+      return galaxy;
     };
 
-    const galaxy = createGalaxy();
-    galaxy.position.set(-350, -80, -300);
-    galaxy.rotation.x = Math.PI * 0.2;
-    scene.add(galaxy);
+    // Main galaxy — white/blue, large
+    const galaxyMain = createGalaxy(
+      25000, 350, 5, 1.5,
+      new THREE.Color(0xffffff),
+      new THREE.Color(0x3366cc),
+      new THREE.Vector3(-300, -50, -400),
+      Math.PI * 0.2, 0
+    );
+    scene.add(galaxyMain);
 
-    // === PLANET with rings ===
-    const planetGroup = new THREE.Group();
-    planetGroup.position.set(300, -100, -500);
+    // Secondary galaxy — pink/purple, distant, tilted
+    const galaxySecondary = createGalaxy(
+      10000, 200, 3, 2.0,
+      new THREE.Color(0xff88cc),
+      new THREE.Color(0x5522aa),
+      new THREE.Vector3(600, 250, -1500),
+      Math.PI * 0.4, Math.PI * 0.15
+    );
+    scene.add(galaxySecondary);
 
-    const planetGeo = new THREE.SphereGeometry(40, 64, 64);
-    const planetMat = new THREE.MeshStandardMaterial({
-      color: 0x2a4a6a,
-      emissive: 0x0a1520,
-      metalness: 0.3,
-      roughness: 0.7,
+    // Tiny distant galaxy
+    const galaxyTiny = createGalaxy(
+      5000, 100, 4, 1.8,
+      new THREE.Color(0xffffee),
+      new THREE.Color(0xffaa33),
+      new THREE.Vector3(-700, -300, -2000),
+      Math.PI * 0.1, Math.PI * 0.3
+    );
+    scene.add(galaxyTiny);
+
+    // =============================================
+    // PLANETS
+    // =============================================
+
+    // Planet 1 — Saturn-like with ring
+    const planet1Group = new THREE.Group();
+    planet1Group.position.set(250, -80, -500);
+
+    const planet1Geo = new THREE.SphereGeometry(50, 64, 64);
+    const planet1Mat = new THREE.MeshStandardMaterial({
+      color: 0xf4e1c1,
+      emissive: 0x1a0e05,
+      metalness: 0.2,
+      roughness: 0.8,
     });
-    const planet = new THREE.Mesh(planetGeo, planetMat);
-    planetGroup.add(planet);
+    const planet1 = new THREE.Mesh(planet1Geo, planet1Mat);
+    planet1Group.add(planet1);
 
-    const ringGeo = new THREE.RingGeometry(50, 80, 128);
-    const ringMat = new THREE.MeshBasicMaterial({
-      color: 0x6688aa,
+    // Ring
+    const ring1Geo = new THREE.RingGeometry(62, 100, 128);
+    const ring1Mat = new THREE.MeshBasicMaterial({
+      color: 0xbbaa88,
       side: THREE.DoubleSide,
       transparent: true,
-      opacity: 0.25,
+      opacity: 0.4,
     });
-    const ringMesh = new THREE.Mesh(ringGeo, ringMat);
-    ringMesh.rotation.x = Math.PI / 2.3;
-    planetGroup.add(ringMesh);
-    scene.add(planetGroup);
+    const ring1 = new THREE.Mesh(ring1Geo, ring1Mat);
+    ring1.rotation.x = Math.PI / 2.2;
+    planet1Group.add(ring1);
+    scene.add(planet1Group);
 
-    // === COMETS ===
-    const comets: { mesh: THREE.Mesh; angle: number; radius: number; speed: number; yOffset: number }[] = [];
-    for (let i = 0; i < 2; i++) {
-      const cometGeo = new THREE.SphereGeometry(2, 10, 10);
-      const cometMat = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-      });
+    // Planet 2 — Blue/green, Earth-like
+    const planet2Geo = new THREE.SphereGeometry(30, 48, 48);
+    const planet2Mat = new THREE.MeshStandardMaterial({
+      color: 0x2266aa,
+      emissive: 0x051520,
+      metalness: 0.1,
+      roughness: 0.9,
+    });
+    const planet2 = new THREE.Mesh(planet2Geo, planet2Mat);
+    planet2.position.set(-450, 120, -700);
+    scene.add(planet2);
+
+    // Planet 2 atmosphere
+    const atmo2Geo = new THREE.SphereGeometry(33, 48, 48);
+    const atmo2Mat = new THREE.MeshBasicMaterial({
+      color: 0x44aaff,
+      transparent: true,
+      opacity: 0.08,
+      side: THREE.BackSide,
+    });
+    const atmo2 = new THREE.Mesh(atmo2Geo, atmo2Mat);
+    atmo2.position.copy(planet2.position);
+    scene.add(atmo2);
+
+    // Planet 3 — Small red/orange, distant
+    const planet3Geo = new THREE.SphereGeometry(18, 32, 32);
+    const planet3Mat = new THREE.MeshStandardMaterial({
+      color: 0xcc4422,
+      emissive: 0x220a05,
+      metalness: 0.3,
+      roughness: 0.6,
+    });
+    const planet3 = new THREE.Mesh(planet3Geo, planet3Mat);
+    planet3.position.set(500, -200, -900);
+    scene.add(planet3);
+
+    // =============================================
+    // ASTEROID BELT around planet 1
+    // =============================================
+    const asteroidBelt = new THREE.Group();
+    for (let i = 0; i < 150; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const beltRadius = 110 + Math.random() * 40;
+      const x = Math.cos(angle) * beltRadius;
+      const z = Math.sin(angle) * beltRadius;
+      const y = (Math.random() - 0.5) * 15;
+      const size = Math.random() * 2 + 0.5;
+      const asteroidGeo = new THREE.SphereGeometry(size, 6, 6);
+      const asteroidMat = new THREE.MeshStandardMaterial({ color: 0x666666 });
+      const asteroid = new THREE.Mesh(asteroidGeo, asteroidMat);
+      asteroid.position.set(x, y, z);
+      asteroid.userData.rotSpeed = {
+        x: (Math.random() - 0.5) * 0.02,
+        y: (Math.random() - 0.5) * 0.02,
+      };
+      asteroidBelt.add(asteroid);
+    }
+    asteroidBelt.position.copy(planet1Group.position);
+    scene.add(asteroidBelt);
+
+    // =============================================
+    // COMETS — multiple with trails
+    // =============================================
+    interface CometData {
+      mesh: THREE.Mesh;
+      trail: THREE.Line;
+      angle: number;
+      radius: number;
+      speed: number;
+      yBase: number;
+      yWave: number;
+      trailPositions: Float32Array;
+    }
+
+    const comets: CometData[] = [];
+    for (let i = 0; i < 4; i++) {
+      // Comet head
+      const cometGeo = new THREE.SphereGeometry(2.5 + Math.random() * 2, 12, 12);
+      const cometMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
       const cometMesh = new THREE.Mesh(cometGeo, cometMat);
       scene.add(cometMesh);
+
+      // Comet trail
+      const trailCount = 30;
+      const trailPositions = new Float32Array(trailCount * 3);
+      const trailGeo = new THREE.BufferGeometry();
+      trailGeo.setAttribute("position", new THREE.BufferAttribute(trailPositions, 3));
+      const trailMat = new THREE.LineBasicMaterial({
+        color: 0xaaddff,
+        transparent: true,
+        opacity: 0.4,
+      });
+      const trail = new THREE.Line(trailGeo, trailMat);
+      scene.add(trail);
+
       comets.push({
         mesh: cometMesh,
+        trail,
         angle: Math.random() * Math.PI * 2,
-        radius: 600 + Math.random() * 300,
-        speed: 0.001 + Math.random() * 0.002,
-        yOffset: (Math.random() - 0.5) * 200,
+        radius: 500 + Math.random() * 600,
+        speed: 0.001 + Math.random() * 0.003,
+        yBase: (Math.random() - 0.5) * 300,
+        yWave: 20 + Math.random() * 30,
+        trailPositions,
       });
     }
 
-    // === LIGHTING — natural space look ===
-    scene.add(new THREE.AmbientLight(0x111122, 0.3));
-    const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
-    dirLight.position.set(100, 200, 100);
-    scene.add(dirLight);
+    // =============================================
+    // COSMIC DUST particles
+    // =============================================
+    const dustGeo = new THREE.BufferGeometry();
+    const dustCount = 2000;
+    const dustPositions = new Float32Array(dustCount * 3);
+    for (let i = 0; i < dustCount; i++) {
+      dustPositions[i * 3] = (Math.random() - 0.5) * 2000;
+      dustPositions[i * 3 + 1] = (Math.random() - 0.5) * 2000;
+      dustPositions[i * 3 + 2] = (Math.random() - 0.5) * 2000;
+    }
+    dustGeo.setAttribute("position", new THREE.BufferAttribute(dustPositions, 3));
+    const dustMat = new THREE.PointsMaterial({
+      color: 0x88aacc,
+      size: 0.5,
+      transparent: true,
+      opacity: 0.3,
+      blending: THREE.AdditiveBlending,
+    });
+    const cosmicDust = new THREE.Points(dustGeo, dustMat);
+    scene.add(cosmicDust);
 
-    // === ANIMATION ===
+    // =============================================
+    // LIGHTING
+    // =============================================
+    scene.add(new THREE.AmbientLight(0x0a0a1a, 0.4));
+
+    const sunLight = new THREE.DirectionalLight(0xffffff, 0.7);
+    sunLight.position.set(200, 300, 200);
+    scene.add(sunLight);
+
+    const rimLight = new THREE.PointLight(0x4488ff, 0.5, 800);
+    rimLight.position.set(-300, 100, -200);
+    scene.add(rimLight);
+
+    const warmLight = new THREE.PointLight(0xffcc66, 0.3, 600);
+    warmLight.position.set(300, -100, 100);
+    scene.add(warmLight);
+
+    // =============================================
+    // ANIMATION LOOP
+    // =============================================
     const clock = new THREE.Clock();
     let animationId: number;
 
@@ -253,38 +498,73 @@ const UniverseScene: React.FC<UniverseSceneProps> = ({ zoom }) => {
       animationId = requestAnimationFrame(animate);
       const elapsed = clock.getElapsedTime();
 
-      starLayer1.rotation.y += 0.00008;
-      starLayer2.rotation.y -= 0.0001;
-      starLayer3.rotation.y += 0.00005;
+      // Star rotation — different speeds for parallax depth
+      starsDeep.rotation.y += 0.00003;
+      starsDeep.rotation.x += 0.00001;
+      starsMid.rotation.y += 0.00006;
+      starsNear.rotation.y += 0.0001;
+      starsBlue.rotation.y -= 0.00004;
+      starsOrange.rotation.y += 0.00005;
 
-      nebulaGroup.rotation.y += 0.00005;
+      // Nebula slow drift
+      nebulaGroup.rotation.y += 0.00003;
+      nebulaGroup.rotation.x += 0.00001;
 
-      galaxy.rotation.y += 0.0002;
+      // Galaxies rotation
+      galaxyMain.rotation.y += 0.00015;
+      galaxySecondary.rotation.y -= 0.0002;
+      galaxyTiny.rotation.y += 0.0003;
 
-      planet.rotation.y += 0.001;
-      ringMesh.rotation.z += 0.0005;
+      // Planets
+      planet1.rotation.y += 0.001;
+      ring1.rotation.z += 0.0003;
+      planet2.rotation.y += 0.0015;
+      planet3.rotation.y += 0.002;
 
-      comets.forEach((comet) => {
-        comet.angle += comet.speed;
-        comet.mesh.position.set(
-          comet.radius * Math.cos(comet.angle),
-          comet.yOffset + 20 * Math.sin(elapsed * 0.3),
-          comet.radius * Math.sin(comet.angle)
-        );
+      // Asteroid belt
+      asteroidBelt.rotation.y += 0.0005;
+      asteroidBelt.children.forEach((a) => {
+        a.rotation.x += a.userData.rotSpeed.x;
+        a.rotation.y += a.userData.rotSpeed.y;
       });
 
-      // Camera
+      // Comets with trails
+      comets.forEach((comet) => {
+        comet.angle += comet.speed;
+        const cx = comet.radius * Math.cos(comet.angle);
+        const cy = comet.yBase + comet.yWave * Math.sin(elapsed * 0.3);
+        const cz = comet.radius * Math.sin(comet.angle);
+        comet.mesh.position.set(cx, cy, cz);
+
+        // Update trail
+        const tp = comet.trailPositions;
+        for (let i = tp.length / 3 - 1; i > 0; i--) {
+          tp[i * 3] = tp[(i - 1) * 3];
+          tp[i * 3 + 1] = tp[(i - 1) * 3 + 1];
+          tp[i * 3 + 2] = tp[(i - 1) * 3 + 2];
+        }
+        tp[0] = cx;
+        tp[1] = cy;
+        tp[2] = cz;
+        (comet.trail.geometry.attributes.position as THREE.BufferAttribute).needsUpdate = true;
+      });
+
+      // Cosmic dust gentle drift
+      cosmicDust.rotation.y += 0.00005;
+      cosmicDust.rotation.x += 0.00002;
+
+      // Camera — smooth motion with zoom
       const zoomVal = zoomRef.current;
       camera.position.z = 500 - zoomVal * 300;
-      camera.position.x = 12 * Math.sin(elapsed * 0.06);
-      camera.position.y = 50 + 10 * Math.cos(elapsed * 0.04);
+      camera.position.x = 15 * Math.sin(elapsed * 0.05);
+      camera.position.y = 80 + 12 * Math.cos(elapsed * 0.04);
       camera.lookAt(0, 0, 0);
 
       composer.render();
     };
     animate();
 
-    // Resize
+    // === RESIZE ===
     const handleResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
