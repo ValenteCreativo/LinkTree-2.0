@@ -12,13 +12,9 @@ import {
   FaRocket,
   FaYoutube,
   FaSpotify,
+  FaChevronDown,
+  FaChevronRight,
 } from "react-icons/fa";
-
-type Link = {
-  title: string;
-  url: string;
-  description?: string;
-};
 
 type SocialKey = keyof typeof iconMap;
 
@@ -36,18 +32,18 @@ const profile = {
   avatar: "/foto-vale2026.png",
   title: "Valentín Martínez",
   banner: "Technology Developer for Social & Environmental Impact",
-  personal: [
-    { title: "GitHub", url: "https://github.com/ValenteCreativo", description: "Código open source" },
-    { title: "Textos Técnicos (Blog)", url: "https://medium.com/@geovalente", description: "Artículos en Medium" },
-    { title: "Programación Creativa", url: "https://codepen.io/ValenteCreativo", description: "Experimentos interactivos" },
-    { title: "Textos / Proyectos", url: "https://valentinmartinezmx.wixsite.com/ideas", description: "Ideas y ensayos" },
-    { title: "Arte / Experimentos / Jams", url: "https://www.instagram.com/valecreativo/", description: "Proceso creativo" },
-    { title: "TA'AK Studio", url: "https://taak-studio.bubbleapps.io/version-test", description: "Studio de diseño" },
-    { title: "Devpost", url: "https://devpost.com/ValenteCreativo", description: "Hackathon projects" },
-    { title: "Taikai", url: "https://taikai.network/valentecreativo", description: "Web3 hackathons" },
-    { title: "Devfolio", url: "https://devfolio.co/@ValenteCreativo/projects", description: "Developer portfolio" },
-    { title: "Dorahacks", url: "https://dorahacks.io/hacker/ValenteCreativo", description: "BUIDL projects" },
-    { title: "NASA SpaceApps", url: "https://www.spaceappschallenge.org/nasa-space-apps-2024/find-a-team/climatewizards/?tab=project", description: "Space challenge" },
+  links: [
+    { title: "GitHub", url: "https://github.com/ValenteCreativo" },
+    { title: "Blog Técnico", url: "https://medium.com/@geovalente" },
+    { title: "Programación Creativa", url: "https://codepen.io/ValenteCreativo" },
+    { title: "TA'AK Studio", url: "https://taak-studio.bubbleapps.io/version-test" },
+  ],
+  hackathons: [
+    { title: "Devpost", url: "https://devpost.com/ValenteCreativo" },
+    { title: "Taikai", url: "https://taikai.network/valentecreativo" },
+    { title: "Devfolio", url: "https://devfolio.co/@ValenteCreativo/projects" },
+    { title: "Dorahacks", url: "https://dorahacks.io/hacker/ValenteCreativo" },
+    { title: "NASA SpaceApps", url: "https://www.spaceappschallenge.org/nasa-space-apps-2024/find-a-team/climatewizards/?tab=project" },
   ],
   socials: [
     { title: "instagram", url: "https://www.instagram.com/ValePantera4" },
@@ -63,6 +59,7 @@ const profile = {
 export default function Home() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [tab, setTab] = useState<"personal" | "portfolio">("personal");
+  const [hackathonsOpen, setHackathonsOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -73,40 +70,6 @@ export default function Home() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const renderLinks = (links: Link[]) => (
-    <motion.div
-      className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 w-full"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      {links.map((link, index) => (
-        <motion.a
-          key={index}
-          href={link.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="link-card group"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.05 }}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-white font-medium text-sm">{link.title}</p>
-              {link.description && (
-                <p className="text-gray-500 text-xs mt-0.5">{link.description}</p>
-              )}
-            </div>
-            <span className="text-gray-600 group-hover:text-green-400 transition-colors text-lg">
-              →
-            </span>
-          </div>
-        </motion.a>
-      ))}
-    </motion.div>
-  );
 
   return (
     <main className="relative min-h-screen font-[var(--font-geist-sans)]">
@@ -128,77 +91,48 @@ export default function Home() {
         />
       </div>
 
+      {/* Scroll indicator arrow */}
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-20 pointer-events-none" style={{ opacity: 1 - scrollProgress * 3 }}>
+        <motion.div
+          animate={{ y: [0, 10, 0] }}
+          transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+          className="flex flex-col items-center gap-2"
+        >
+          <span className="text-white/60 text-xs tracking-widest uppercase">Scroll</span>
+          <FaChevronDown className="text-white/60 text-lg" />
+        </motion.div>
+      </div>
+
       {/* Main Content */}
       <div className="relative z-10">
-        {/* Spacer for scroll effect */}
         <section className="h-screen" />
 
         {/* Profile Section */}
-        <section className="min-h-screen flex items-start justify-center pt-16 pb-20 px-4">
-          <div className="w-full max-w-xl">
-            {/* Profile Card */}
+        <section className="min-h-screen flex items-start justify-center pt-12 pb-20 px-4">
+          <div className="w-full max-w-md">
             <motion.div
-              className="bg-black/70 backdrop-blur-xl rounded-2xl p-8 border border-white/10 shadow-2xl"
+              className="bg-black/60 backdrop-blur-sm rounded-2xl p-8 border border-white/5 shadow-2xl"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
               {/* Avatar & Name */}
-              <div className="flex flex-col items-center space-y-4 mb-6">
+              <div className="flex flex-col items-center space-y-3 mb-6">
                 <div className="relative">
-                  <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-green-500 via-blue-500 to-purple-500 opacity-60 blur-sm" />
+                  <div className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-green-500 to-blue-500 opacity-50 blur-[2px]" />
                   <img
                     loading="lazy"
-                    className="relative rounded-full w-28 h-28 object-cover border-2 border-white/20"
+                    className="relative rounded-full w-24 h-24 object-cover"
                     src={profile.avatar}
                     alt={profile.title}
                   />
                 </div>
-                <h1 className="text-2xl font-bold text-white">{profile.title}</h1>
-                <p className="banner-text">{profile.banner}</p>
+                <h1 className="text-xl font-bold text-white">{profile.title}</h1>
+                <p className="banner-text text-xs">{profile.banner}</p>
               </div>
 
-              {/* Tabs */}
-              <div className="flex justify-center gap-3 mb-6">
-                {(["personal", "portfolio"] as const).map((t) => (
-                  <button
-                    key={t}
-                    className={`tab-pill ${tab === t ? "tab-pill-active" : "tab-pill-inactive"}`}
-                    onClick={() => setTab(t)}
-                  >
-                    {t === "personal" ? "Personal" : "Portafolio"}
-                  </button>
-                ))}
-              </div>
-
-              {/* Content */}
-              <AnimatePresence mode="wait">
-                {tab === "personal" && (
-                  <motion.div
-                    key="personal"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {renderLinks(profile.personal)}
-                  </motion.div>
-                )}
-                {tab === "portfolio" && (
-                  <motion.div
-                    key="portfolio"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <PortfolioSection />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Social Icons */}
-              <div className="flex justify-center gap-5 mt-8 pt-6 border-t border-white/10">
+              {/* Social Icons — top, compact */}
+              <div className="flex justify-center gap-4 mb-6">
                 {profile.socials.map((social, index) => {
                   const key = social.title.toLowerCase() as SocialKey;
                   const icon = iconMap[key];
@@ -216,6 +150,100 @@ export default function Home() {
                   ) : null;
                 })}
               </div>
+
+              {/* Tabs */}
+              <div className="flex justify-center gap-2 mb-5">
+                {(["personal", "portfolio"] as const).map((t) => (
+                  <button
+                    key={t}
+                    className={`tab-pill ${tab === t ? "tab-pill-active" : "tab-pill-inactive"}`}
+                    onClick={() => setTab(t)}
+                  >
+                    {t === "personal" ? "Personal" : "Portafolio"}
+                  </button>
+                ))}
+              </div>
+
+              {/* Content */}
+              <AnimatePresence mode="wait">
+                {tab === "personal" && (
+                  <motion.div
+                    key="personal"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-2"
+                  >
+                    {/* Main links — clean list */}
+                    {profile.links.map((link, i) => (
+                      <a
+                        key={i}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="link-card flex items-center justify-between group"
+                      >
+                        <span className="text-white text-sm font-medium">{link.title}</span>
+                        <FaChevronRight className="text-gray-600 group-hover:text-green-400 text-xs transition-colors" />
+                      </a>
+                    ))}
+
+                    {/* Hackathons — collapsible */}
+                    <div className="mt-3">
+                      <button
+                        onClick={() => setHackathonsOpen(!hackathonsOpen)}
+                        className="w-full link-card flex items-center justify-between"
+                      >
+                        <span className="text-white text-sm font-medium">🏆 Hackathones</span>
+                        <motion.span
+                          animate={{ rotate: hackathonsOpen ? 90 : 0 }}
+                          className="text-gray-500 text-xs"
+                        >
+                          <FaChevronRight />
+                        </motion.span>
+                      </button>
+                      <AnimatePresence>
+                        {hackathonsOpen && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="pl-4 pt-1 space-y-1">
+                              {profile.hackathons.map((hack, i) => (
+                                <a
+                                  key={i}
+                                  href={hack.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="block py-2 px-3 text-gray-400 text-xs hover:text-white transition-colors rounded-lg hover:bg-white/5"
+                                >
+                                  {hack.title}
+                                </a>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </motion.div>
+                )}
+
+                {tab === "portfolio" && (
+                  <motion.div
+                    key="portfolio"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <PortfolioSection />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           </div>
         </section>

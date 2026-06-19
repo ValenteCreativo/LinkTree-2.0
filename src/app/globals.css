@@ -96,3 +96,12 @@ body {
 .social-icon {
   @apply text-xl text-gray-400 transition-all duration-300 hover:text-white hover:scale-125;
 }
+
+/* Hide scrollbar for horizontal scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

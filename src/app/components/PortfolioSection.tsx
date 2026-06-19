@@ -1,147 +1,194 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import Microlink from "@microlink/react";
+import { motion } from "framer-motion";
 
 type PortfolioItem = {
   url: string;
-  category: string;
-};
-
-type CategoryInfo = {
   label: string;
-  color: string;
-  bgColor: string;
 };
 
-const portfolioItems: PortfolioItem[] = [
-  // Impacto Ambiental
-  { url: "https://aura-tau-five.vercel.app", category: "ambiental" },
-  { url: "https://arvi-eight.vercel.app", category: "ambiental" },
-  { url: "https://seedr-three.vercel.app", category: "ambiental" },
-  { url: "https://rembu-app.vercel.app", category: "ambiental" },
-  { url: "https://aona.vercel.app", category: "ambiental" },
-  { url: "https://sen-network1.vercel.app", category: "ambiental" },
-  // Impacto Social
-  { url: "https://carepilot-tau.vercel.app", category: "social" },
-  { url: "https://www.side-b.art", category: "social" },
-  { url: "https://sigilo-zeta.vercel.app", category: "social" },
-  { url: "https://supply-cycle.vercel.app", category: "social" },
-  { url: "https://bitbitmami.netlify.app", category: "social" },
-  // Cliente
-  { url: "https://martina-store-2.vercel.app", category: "cliente" },
-  { url: "https://rizoma-shipyard-ynwq.vercel.app", category: "cliente" },
-  { url: "https://rls-jerusalem-336.vercel.app/public", category: "cliente" },
-  { url: "https://patrimo.pro", category: "cliente" },
-  // Arte
-  { url: "https://instalacion-dimensiones.vercel.app", category: "arte" },
-  { url: "https://kinetic-poiesis.vercel.app", category: "arte" },
-  { url: "https://audioreactive-visualizer.vercel.app", category: "arte" },
-  // Juegos
-  { url: "https://la-reta.vercel.app", category: "juegos" },
-  { url: "https://guardabosques.vercel.app", category: "juegos" },
-  { url: "https://mariachi-vs-inflation.vercel.app", category: "juegos" },
-  // Experimentos
-  { url: "https://www.patas4land.xyz", category: "experimento" },
-  { url: "https://quantum-looper.netlify.app", category: "experimento" },
-  { url: "https://circulo-de-quintas-one.vercel.app", category: "experimento" },
-  // Gobernanza
-  { url: "https://bnb-research-commons-five.vercel.app", category: "gobernanza" },
+type Category = {
+  id: string;
+  label: string;
+  emoji: string;
+  color: string;
+  items: PortfolioItem[];
+};
+
+const categories: Category[] = [
+  {
+    id: "ambiental",
+    label: "Impacto Ambiental",
+    emoji: "🌱",
+    color: "from-green-500/20 to-green-900/10",
+    items: [
+      { url: "https://aura-tau-five.vercel.app", label: "Aura" },
+      { url: "https://arvi-eight.vercel.app", label: "Arvi" },
+      { url: "https://seedr-three.vercel.app", label: "Seedr" },
+      { url: "https://rembu-app.vercel.app", label: "Rembu" },
+      { url: "https://aona.vercel.app", label: "Aona" },
+      { url: "https://sen-network1.vercel.app", label: "SEN Network" },
+    ],
+  },
+  {
+    id: "social",
+    label: "Impacto Social",
+    emoji: "🤝",
+    color: "from-blue-500/20 to-blue-900/10",
+    items: [
+      { url: "https://carepilot-tau.vercel.app", label: "CarePilot" },
+      { url: "https://www.side-b.art", label: "Side-B" },
+      { url: "https://sigilo-zeta.vercel.app", label: "Sigilo" },
+      { url: "https://supply-cycle.vercel.app", label: "Supply Cycle" },
+      { url: "https://bitbitmami.netlify.app", label: "BitBitMami" },
+    ],
+  },
+  {
+    id: "cliente",
+    label: "Clientes",
+    emoji: "💼",
+    color: "from-amber-500/20 to-amber-900/10",
+    items: [
+      { url: "https://martina-store-2.vercel.app", label: "Martina Store" },
+      { url: "https://rizoma-shipyard-ynwq.vercel.app", label: "Rizoma" },
+      { url: "https://rls-jerusalem-336.vercel.app/public", label: "RLS Jerusalem" },
+      { url: "https://patrimo.pro", label: "Patrimo" },
+    ],
+  },
+  {
+    id: "arte",
+    label: "Arte & Creatividad",
+    emoji: "🎨",
+    color: "from-pink-500/20 to-pink-900/10",
+    items: [
+      { url: "https://instalacion-dimensiones.vercel.app", label: "Dimensiones" },
+      { url: "https://kinetic-poiesis.vercel.app", label: "Kinetic Poiesis" },
+      { url: "https://audioreactive-visualizer.vercel.app", label: "Audioreactive" },
+    ],
+  },
+  {
+    id: "juegos",
+    label: "Juegos",
+    emoji: "🎮",
+    color: "from-purple-500/20 to-purple-900/10",
+    items: [
+      { url: "https://la-reta.vercel.app", label: "La Reta" },
+      { url: "https://guardabosques.vercel.app", label: "Guardabosques" },
+      { url: "https://mariachi-vs-inflation.vercel.app", label: "Mariachi vs Inflation" },
+    ],
+  },
+  {
+    id: "experimento",
+    label: "Experimentos",
+    emoji: "🧪",
+    color: "from-cyan-500/20 to-cyan-900/10",
+    items: [
+      { url: "https://www.patas4land.xyz", label: "Patas4Land" },
+      { url: "https://quantum-looper.netlify.app", label: "Quantum Looper" },
+      { url: "https://circulo-de-quintas-one.vercel.app", label: "Círculo de Quintas" },
+    ],
+  },
+  {
+    id: "gobernanza",
+    label: "Gobernanza",
+    emoji: "⚖️",
+    color: "from-orange-500/20 to-orange-900/10",
+    items: [
+      { url: "https://bnb-research-commons-five.vercel.app", label: "BNB Research Commons" },
+    ],
+  },
 ];
 
-const categories: Record<string, CategoryInfo> = {
-  all: { label: "Todos", color: "text-white", bgColor: "bg-white/10" },
-  ambiental: { label: "🌱 Ambiental", color: "text-green-400", bgColor: "bg-green-500/10" },
-  social: { label: "🤝 Social", color: "text-blue-400", bgColor: "bg-blue-500/10" },
-  cliente: { label: "💼 Cliente", color: "text-amber-400", bgColor: "bg-amber-500/10" },
-  arte: { label: "🎨 Arte", color: "text-pink-400", bgColor: "bg-pink-500/10" },
-  juegos: { label: "🎮 Juegos", color: "text-purple-400", bgColor: "bg-purple-500/10" },
-  experimento: { label: "🧪 Experimento", color: "text-cyan-400", bgColor: "bg-cyan-500/10" },
-  gobernanza: { label: "⚖️ Gobernanza", color: "text-orange-400", bgColor: "bg-orange-500/10" },
-};
+function getScreenshotUrl(url: string): string {
+  return `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url`;
+}
 
 export default function PortfolioSection() {
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const filteredItems =
-    activeCategory === "all"
-      ? portfolioItems
-      : portfolioItems.filter((item) => item.category === activeCategory);
+  const displayCategories = activeCategory
+    ? categories.filter((c) => c.id === activeCategory)
+    : categories;
 
   return (
-    <div className="w-full">
-      {/* Category Filters */}
-      <div className="flex flex-wrap justify-center gap-2 mb-5">
-        {Object.entries(categories).map(([key, cat]) => (
+    <div className="w-full space-y-4">
+      {/* Filter chips */}
+      <div className="flex flex-wrap justify-center gap-1.5 mb-4">
+        <button
+          onClick={() => setActiveCategory(null)}
+          className={`px-3 py-1 rounded-full text-xs transition-all ${
+            activeCategory === null
+              ? "bg-white/10 text-white ring-1 ring-white/20"
+              : "text-gray-500 hover:text-gray-300"
+          }`}
+        >
+          Todos
+        </button>
+        {categories.map((cat) => (
           <button
-            key={key}
-            onClick={() => setActiveCategory(key)}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
-              activeCategory === key
-                ? `${cat.bgColor} ${cat.color} ring-1 ring-current`
-                : "bg-white/5 text-gray-500 hover:text-gray-300 hover:bg-white/10"
+            key={cat.id}
+            onClick={() => setActiveCategory(activeCategory === cat.id ? null : cat.id)}
+            className={`px-3 py-1 rounded-full text-xs transition-all ${
+              activeCategory === cat.id
+                ? "bg-white/10 text-white ring-1 ring-white/20"
+                : "text-gray-500 hover:text-gray-300"
             }`}
           >
-            {cat.label}
+            {cat.emoji} {cat.label}
           </button>
         ))}
       </div>
 
-      {/* Project count */}
-      <p className="text-center text-gray-500 text-xs mb-4">
-        {filteredItems.length} proyecto{filteredItems.length !== 1 ? "s" : ""}
-      </p>
+      {/* Categories with horizontal scroll */}
+      <div className="space-y-5 max-h-[55vh] overflow-y-auto pr-1">
+        {displayCategories.map((category) => (
+          <motion.div
+            key={category.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-2"
+          >
+            {/* Category header */}
+            <h3 className="text-xs font-medium text-gray-400 px-1">
+              {category.emoji} {category.label}
+              <span className="text-gray-600 ml-2">({category.items.length})</span>
+            </h3>
 
-      {/* Portfolio Grid */}
-      <motion.div
-        className="grid grid-cols-1 gap-4 max-h-[60vh] overflow-y-auto pr-1"
-        layout
-      >
-        <AnimatePresence mode="popLayout">
-          {filteredItems.map((item, index) => (
-            <motion.div
-              key={item.url}
-              className="portfolio-card"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ delay: index * 0.03 }}
-              layout
-            >
-              <a
-                href={item.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block"
-              >
-                <Microlink
-                  url={item.url}
-                  size="large"
-                  style={{
-                    width: "100%",
-                    borderRadius: "12px",
-                    border: "none",
-                    background: "transparent",
-                    fontFamily: "inherit",
-                  }}
-                  media={["image", "logo"]}
-                />
-                <div className="px-4 pb-3 pt-1 flex items-center justify-between">
-                  <span
-                    className={`category-badge ${categories[item.category]?.bgColor} ${categories[item.category]?.color}`}
-                  >
-                    {categories[item.category]?.label}
-                  </span>
-                  <span className="text-gray-600 text-xs truncate max-w-[180px]">
-                    {item.url.replace(/https?:\/\//, "").replace(/\/$/, "")}
-                  </span>
-                </div>
-              </a>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </motion.div>
+            {/* Horizontal scroll row */}
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+              {category.items.map((item) => (
+                <a
+                  key={item.url}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-shrink-0 group"
+                >
+                  <div className={`w-52 rounded-xl overflow-hidden bg-gradient-to-b ${category.color} border border-white/5 hover:border-white/15 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`}>
+                    {/* Screenshot */}
+                    <div className="w-full h-32 bg-gray-900/50 overflow-hidden">
+                      <img
+                        src={getScreenshotUrl(item.url)}
+                        alt={item.label}
+                        className="w-full h-full object-cover object-top opacity-90 group-hover:opacity-100 transition-opacity"
+                        loading="lazy"
+                      />
+                    </div>
+                    {/* Label */}
+                    <div className="px-3 py-2">
+                      <p className="text-white text-xs font-medium truncate">{item.label}</p>
+                      <p className="text-gray-500 text-[10px] truncate mt-0.5">
+                        {item.url.replace(/https?:\/\//, "").replace(/\/$/, "")}
+                      </p>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </motion.div>
+        ))}
+      </div>
     </div>
   );
 }
