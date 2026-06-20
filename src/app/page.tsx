@@ -45,6 +45,8 @@ const profile = {
     { title: "Devfolio", url: "https://devfolio.co/@ValenteCreativo/projects" },
     { title: "Dorahacks", url: "https://dorahacks.io/hacker/ValenteCreativo" },
     { title: "NASA SpaceApps", url: "https://www.spaceappschallenge.org/nasa-space-apps-2024/find-a-team/climatewizards/?tab=project" },
+    { title: "EthGlobal HackMoney", url: "https://ethglobal.com/showcase/orien-c6wsvy" },
+    { title: "EthGlobal Buenos Aires", url: "http://ethglobal.com/showcase/sigilo-b526k" },
   ],
   socials: [
     { title: "instagram", url: "https://www.instagram.com/ValePantera4" },
