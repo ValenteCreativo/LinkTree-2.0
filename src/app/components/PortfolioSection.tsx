@@ -64,7 +64,7 @@ const categories: Category[] = [
     color: "from-pink-500/20 to-pink-900/10",
     items: [
       { url: "https://instalacion-dimensiones.vercel.app", label: "Dimensiones" },
-      { url: "https://aura-scanner-bice.vercel.app?v=2", label: "Aura Scanner" },
+      { url: "https://aura-scanner-bice.vercel.app", label: "Aura Scanner" },
       { url: "https://kinetic-poiesis.vercel.app", label: "Kinetic Poiesis" },
       { url: "https://audioreactive-visualizer.vercel.app", label: "Audioreactive" },
       { url: "https://quantum-looper.netlify.app", label: "Quantum Looper" },
@@ -100,6 +100,7 @@ function getScreenshotUrl(url: string): string {
     "https://care-pilot-nu.vercel.app": "/care-pilot-screenshot.png",
     "https://arvi-eight.vercel.app": "/arvi-screenshot.png",
     "https://aura-tau-five.vercel.app": "/aura-screenshot.png",
+    "https://aura-scanner-bice.vercel.app": "/aura-scanner-screenshot.png",
   };
 
   // Check if we have a manual screenshot for this URL
