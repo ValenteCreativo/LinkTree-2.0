@@ -52,7 +52,7 @@ const categories: Category[] = [
     items: [
       { url: "https://martina-store-2.vercel.app", label: "Martina Store" },
       { url: "https://rizoma-shipyard-ynwq.vercel.app", label: "Rizoma" },
-      { url: "https://rls-jerusalem-336.vercel.app/public", label: "RLS Jerusalem" },
+      { url: "https://rls-jerusalem-336-ivory.vercel.app/", label: "RLS Jerusalem" },
       { url: "https://patrimo.pro", label: "Patrimo" },
       { url: "https://www.patas4land.xyz", label: "Patas4Land" },
     ],
