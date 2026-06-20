@@ -403,7 +403,7 @@ const UniverseScene: React.FC<UniverseSceneProps> = ({ zoom }) => {
     scene.add(asteroidBelt);
 
     // =============================================
-    // COMETS — multiple with trails
+    // COMETS — multiple with trails (orbital)
     // =============================================
     interface CometData {
       mesh: THREE.Mesh;
@@ -417,22 +417,32 @@ const UniverseScene: React.FC<UniverseSceneProps> = ({ zoom }) => {
     }
 
     const comets: CometData[] = [];
-    for (let i = 0; i < 4; i++) {
-      // Comet head
-      const cometGeo = new THREE.SphereGeometry(2.5 + Math.random() * 2, 12, 12);
+    for (let i = 0; i < 6; i++) {
+      // Comet head — glowing
+      const cometGeo = new THREE.SphereGeometry(2.0 + Math.random() * 2.5, 12, 12);
       const cometMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
       const cometMesh = new THREE.Mesh(cometGeo, cometMat);
       scene.add(cometMesh);
 
-      // Comet trail
-      const trailCount = 30;
+      // Comet glow
+      const glowGeo = new THREE.SphereGeometry(5 + Math.random() * 3, 12, 12);
+      const glowMat = new THREE.MeshBasicMaterial({
+        color: 0x88ccff,
+        transparent: true,
+        opacity: 0.15,
+      });
+      const glowMesh = new THREE.Mesh(glowGeo, glowMat);
+      cometMesh.add(glowMesh);
+
+      // Comet trail — longer
+      const trailCount = 50;
       const trailPositions = new Float32Array(trailCount * 3);
       const trailGeo = new THREE.BufferGeometry();
       trailGeo.setAttribute("position", new THREE.BufferAttribute(trailPositions, 3));
       const trailMat = new THREE.LineBasicMaterial({
-        color: 0xaaddff,
+        color: i % 2 === 0 ? 0xaaddff : 0xffddaa,
         transparent: true,
-        opacity: 0.4,
+        opacity: 0.5,
       });
       const trail = new THREE.Line(trailGeo, trailMat);
       scene.add(trail);
@@ -441,11 +451,133 @@ const UniverseScene: React.FC<UniverseSceneProps> = ({ zoom }) => {
         mesh: cometMesh,
         trail,
         angle: Math.random() * Math.PI * 2,
-        radius: 500 + Math.random() * 600,
-        speed: 0.001 + Math.random() * 0.003,
-        yBase: (Math.random() - 0.5) * 300,
-        yWave: 20 + Math.random() * 30,
+        radius: 400 + Math.random() * 800,
+        speed: 0.002 + Math.random() * 0.005,
+        yBase: (Math.random() - 0.5) * 400,
+        yWave: 30 + Math.random() * 50,
         trailPositions,
+      });
+    }
+
+    // =============================================
+    // SHOOTING STARS — fast streaks across the sky
+    // =============================================
+    interface ShootingStar {
+      mesh: THREE.Mesh;
+      trail: THREE.Line;
+      position: THREE.Vector3;
+      velocity: THREE.Vector3;
+      life: number;
+      maxLife: number;
+      trailPositions: Float32Array;
+      active: boolean;
+    }
+
+    const shootingStars: ShootingStar[] = [];
+    const SHOOTING_STAR_COUNT = 8;
+
+    const resetShootingStar = (star: ShootingStar) => {
+      // Random spawn on edges of the visible scene
+      const side = Math.random();
+      if (side < 0.5) {
+        star.position.set(
+          (Math.random() - 0.5) * 2000,
+          400 + Math.random() * 300,
+          -200 - Math.random() * 1000
+        );
+        star.velocity.set(
+          (Math.random() - 0.5) * 8,
+          -(3 + Math.random() * 5),
+          -(Math.random() * 3)
+        );
+      } else {
+        star.position.set(
+          -1000 + Math.random() * 500,
+          (Math.random() - 0.5) * 600,
+          -200 - Math.random() * 800
+        );
+        star.velocity.set(
+          5 + Math.random() * 6,
+          (Math.random() - 0.5) * 3,
+          -(Math.random() * 2)
+        );
+      }
+      star.life = 0;
+      star.maxLife = 60 + Math.random() * 90;
+      star.active = true;
+      // Clear trail
+      star.trailPositions.fill(0);
+    };
+
+    for (let i = 0; i < SHOOTING_STAR_COUNT; i++) {
+      const starGeo = new THREE.SphereGeometry(1.2, 6, 6);
+      const starMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const starMesh = new THREE.Mesh(starGeo, starMat);
+      scene.add(starMesh);
+
+      const trailCount = 20;
+      const trailPositions = new Float32Array(trailCount * 3);
+      const trailGeo = new THREE.BufferGeometry();
+      trailGeo.setAttribute("position", new THREE.BufferAttribute(trailPositions, 3));
+      const trailMat = new THREE.LineBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.6,
+      });
+      const trailLine = new THREE.Line(trailGeo, trailMat);
+      scene.add(trailLine);
+
+      const star: ShootingStar = {
+        mesh: starMesh,
+        trail: trailLine,
+        position: new THREE.Vector3(),
+        velocity: new THREE.Vector3(),
+        life: 0,
+        maxLife: 100,
+        trailPositions,
+        active: false,
+      };
+      // Stagger activation
+      setTimeout(() => resetShootingStar(star), i * 2000 + Math.random() * 3000);
+      shootingStars.push(star);
+    }
+
+    // =============================================
+    // ENERGY PULSES — expanding rings
+    // =============================================
+    interface EnergyPulse {
+      ring: THREE.Mesh;
+      life: number;
+      maxLife: number;
+      speed: number;
+      active: boolean;
+    }
+
+    const energyPulses: EnergyPulse[] = [];
+    for (let i = 0; i < 3; i++) {
+      const ringGeo = new THREE.RingGeometry(1, 3, 64);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: [0x44aaff, 0xff66aa, 0x66ffaa][i],
+        transparent: true,
+        opacity: 0.4,
+        side: THREE.DoubleSide,
+      });
+      const ring = new THREE.Mesh(ringGeo, ringMat);
+      ring.position.set(
+        (Math.random() - 0.5) * 400,
+        (Math.random() - 0.5) * 200,
+        -300 - Math.random() * 500
+      );
+      ring.rotation.x = Math.random() * Math.PI;
+      ring.rotation.y = Math.random() * Math.PI;
+      ring.visible = false;
+      scene.add(ring);
+      energyPulses.push({
+        ring,
+        life: 0,
+        maxLife: 120 + Math.random() * 60,
+        speed: 1.5 + Math.random(),
+        active: false,
       });
     }
 
@@ -493,47 +625,62 @@ const UniverseScene: React.FC<UniverseSceneProps> = ({ zoom }) => {
     // =============================================
     const clock = new THREE.Clock();
     let animationId: number;
+    let frameCount = 0;
 
     const animate = () => {
       animationId = requestAnimationFrame(animate);
       const elapsed = clock.getElapsedTime();
+      frameCount++;
 
-      // Star rotation — different speeds for parallax depth
-      starsDeep.rotation.y += 0.00003;
-      starsDeep.rotation.x += 0.00001;
-      starsMid.rotation.y += 0.00006;
-      starsNear.rotation.y += 0.0001;
-      starsBlue.rotation.y -= 0.00004;
-      starsOrange.rotation.y += 0.00005;
+      // Star rotation — different speeds for parallax depth (faster)
+      starsDeep.rotation.y += 0.00005;
+      starsDeep.rotation.x += 0.00002;
+      starsMid.rotation.y += 0.0001;
+      starsMid.rotation.x += 0.00003 * Math.sin(elapsed * 0.1);
+      starsNear.rotation.y += 0.00015;
+      starsBlue.rotation.y -= 0.00007;
+      starsOrange.rotation.y += 0.00008;
 
-      // Nebula slow drift
-      nebulaGroup.rotation.y += 0.00003;
-      nebulaGroup.rotation.x += 0.00001;
+      // Nebula pulsing & drift — breathing effect
+      nebulaGroup.rotation.y += 0.00005;
+      nebulaGroup.rotation.x += 0.00002;
+      nebulaGroup.children.forEach((nebula, i) => {
+        const pulse = 1 + 0.03 * Math.sin(elapsed * (0.2 + i * 0.08) + i * 1.5);
+        nebula.scale.set(pulse, pulse, 1);
+        // Gentle opacity fluctuation
+        const mat = (nebula as THREE.Sprite).material;
+        if (mat) {
+          mat.opacity = mat.opacity * (0.97 + 0.03 * Math.sin(elapsed * 0.3 + i));
+        }
+      });
 
-      // Galaxies rotation
-      galaxyMain.rotation.y += 0.00015;
-      galaxySecondary.rotation.y -= 0.0002;
-      galaxyTiny.rotation.y += 0.0003;
+      // Galaxies rotation — faster, more alive
+      galaxyMain.rotation.y += 0.0003;
+      galaxySecondary.rotation.y -= 0.0004;
+      galaxyTiny.rotation.y += 0.0005;
 
-      // Planets
-      planet1.rotation.y += 0.001;
-      ring1.rotation.z += 0.0003;
-      planet2.rotation.y += 0.0015;
-      planet3.rotation.y += 0.002;
+      // Planets — orbital bob motion
+      planet1.rotation.y += 0.002;
+      ring1.rotation.z += 0.0005;
+      planet1Group.position.y += Math.sin(elapsed * 0.2) * 0.05;
+      planet2.rotation.y += 0.0025;
+      planet2.position.y = 120 + 8 * Math.sin(elapsed * 0.15);
+      planet3.rotation.y += 0.003;
+      planet3.position.x = 500 + 15 * Math.sin(elapsed * 0.1);
 
-      // Asteroid belt
-      asteroidBelt.rotation.y += 0.0005;
+      // Asteroid belt — faster
+      asteroidBelt.rotation.y += 0.001;
       asteroidBelt.children.forEach((a) => {
         a.rotation.x += a.userData.rotSpeed.x;
         a.rotation.y += a.userData.rotSpeed.y;
       });
 
-      // Comets with trails
+      // Comets with trails (orbital)
       comets.forEach((comet) => {
         comet.angle += comet.speed;
         const cx = comet.radius * Math.cos(comet.angle);
-        const cy = comet.yBase + comet.yWave * Math.sin(elapsed * 0.3);
-        const cz = comet.radius * Math.sin(comet.angle);
+        const cy = comet.yBase + comet.yWave * Math.sin(elapsed * 0.5 + comet.angle);
+        const cz = comet.radius * Math.sin(comet.angle) * 0.6;
         comet.mesh.position.set(cx, cy, cz);
 
         // Update trail
@@ -549,16 +696,96 @@ const UniverseScene: React.FC<UniverseSceneProps> = ({ zoom }) => {
         (comet.trail.geometry.attributes.position as THREE.BufferAttribute).needsUpdate = true;
       });
 
-      // Cosmic dust gentle drift
-      cosmicDust.rotation.y += 0.00005;
-      cosmicDust.rotation.x += 0.00002;
+      // Shooting stars — fast linear streaks
+      shootingStars.forEach((star) => {
+        if (!star.active) {
+          // Random respawn
+          if (Math.random() < 0.005) resetShootingStar(star);
+          star.mesh.visible = false;
+          star.trail.visible = false;
+          return;
+        }
 
-      // Camera — smooth motion with zoom
+        star.life++;
+        if (star.life > star.maxLife) {
+          star.active = false;
+          star.mesh.visible = false;
+          star.trail.visible = false;
+          return;
+        }
+
+        star.mesh.visible = true;
+        star.trail.visible = true;
+
+        // Move fast
+        star.position.add(star.velocity);
+        star.mesh.position.copy(star.position);
+
+        // Fade based on life
+        const lifeFrac = star.life / star.maxLife;
+        const alpha = lifeFrac < 0.1 ? lifeFrac * 10 : lifeFrac > 0.7 ? (1 - lifeFrac) / 0.3 : 1;
+        (star.mesh.material as THREE.MeshBasicMaterial).opacity = alpha;
+        (star.trail.material as THREE.LineBasicMaterial).opacity = alpha * 0.5;
+
+        // Update trail
+        const tp = star.trailPositions;
+        for (let i = tp.length / 3 - 1; i > 0; i--) {
+          tp[i * 3] = tp[(i - 1) * 3];
+          tp[i * 3 + 1] = tp[(i - 1) * 3 + 1];
+          tp[i * 3 + 2] = tp[(i - 1) * 3 + 2];
+        }
+        tp[0] = star.position.x;
+        tp[1] = star.position.y;
+        tp[2] = star.position.z;
+        (star.trail.geometry.attributes.position as THREE.BufferAttribute).needsUpdate = true;
+      });
+
+      // Energy pulses — expanding rings
+      energyPulses.forEach((pulse) => {
+        if (!pulse.active) {
+          // Random activation
+          if (Math.random() < 0.002) {
+            pulse.active = true;
+            pulse.life = 0;
+            pulse.ring.visible = true;
+            pulse.ring.scale.set(1, 1, 1);
+            pulse.ring.position.set(
+              (Math.random() - 0.5) * 600,
+              (Math.random() - 0.5) * 300,
+              -200 - Math.random() * 600
+            );
+          }
+          return;
+        }
+
+        pulse.life++;
+        const scale = 1 + pulse.life * pulse.speed;
+        pulse.ring.scale.set(scale, scale, scale);
+        const opacity = 0.4 * (1 - pulse.life / pulse.maxLife);
+        (pulse.ring.material as THREE.MeshBasicMaterial).opacity = Math.max(0, opacity);
+
+        if (pulse.life >= pulse.maxLife) {
+          pulse.active = false;
+          pulse.ring.visible = false;
+        }
+      });
+
+      // Cosmic dust — turbulent drift
+      cosmicDust.rotation.y += 0.0001;
+      cosmicDust.rotation.x += 0.00005;
+      cosmicDust.position.x = 5 * Math.sin(elapsed * 0.08);
+      cosmicDust.position.y = 3 * Math.cos(elapsed * 0.06);
+
+      // Camera — more dynamic movement with zoom
       const zoomVal = zoomRef.current;
       camera.position.z = 500 - zoomVal * 300;
-      camera.position.x = 15 * Math.sin(elapsed * 0.05);
-      camera.position.y = 80 + 12 * Math.cos(elapsed * 0.04);
-      camera.lookAt(0, 0, 0);
+      camera.position.x = 25 * Math.sin(elapsed * 0.07) + 10 * Math.sin(elapsed * 0.15);
+      camera.position.y = 80 + 18 * Math.cos(elapsed * 0.05) + 8 * Math.sin(elapsed * 0.12);
+      camera.lookAt(
+        5 * Math.sin(elapsed * 0.03),
+        3 * Math.cos(elapsed * 0.04),
+        0
+      );
 
       composer.render();
     };

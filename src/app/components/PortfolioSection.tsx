@@ -87,6 +87,7 @@ const categories: Category[] = [
     emoji: "⚖️",
     color: "from-orange-500/20 to-orange-900/10",
     items: [
+      { url: "https://orien-wine.vercel.app/", label: "Orien" },
       { url: "https://bnb-research-commons-five.vercel.app", label: "BNB Research Commons" },
     ],
   },
