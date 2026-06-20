@@ -542,44 +542,7 @@ const UniverseScene: React.FC<UniverseSceneProps> = ({ zoom }) => {
       shootingStars.push(star);
     }
 
-    // =============================================
-    // ENERGY PULSES — expanding rings
-    // =============================================
-    interface EnergyPulse {
-      ring: THREE.Mesh;
-      life: number;
-      maxLife: number;
-      speed: number;
-      active: boolean;
-    }
 
-    const energyPulses: EnergyPulse[] = [];
-    for (let i = 0; i < 3; i++) {
-      const ringGeo = new THREE.RingGeometry(1, 3, 64);
-      const ringMat = new THREE.MeshBasicMaterial({
-        color: [0x44aaff, 0xff66aa, 0x66ffaa][i],
-        transparent: true,
-        opacity: 0.4,
-        side: THREE.DoubleSide,
-      });
-      const ring = new THREE.Mesh(ringGeo, ringMat);
-      ring.position.set(
-        (Math.random() - 0.5) * 400,
-        (Math.random() - 0.5) * 200,
-        -300 - Math.random() * 500
-      );
-      ring.rotation.x = Math.random() * Math.PI;
-      ring.rotation.y = Math.random() * Math.PI;
-      ring.visible = false;
-      scene.add(ring);
-      energyPulses.push({
-        ring,
-        life: 0,
-        maxLife: 120 + Math.random() * 60,
-        speed: 1.5 + Math.random(),
-        active: false,
-      });
-    }
 
     // =============================================
     // COSMIC DUST particles
@@ -740,35 +703,7 @@ const UniverseScene: React.FC<UniverseSceneProps> = ({ zoom }) => {
         (star.trail.geometry.attributes.position as THREE.BufferAttribute).needsUpdate = true;
       });
 
-      // Energy pulses — expanding rings
-      energyPulses.forEach((pulse) => {
-        if (!pulse.active) {
-          // Random activation
-          if (Math.random() < 0.002) {
-            pulse.active = true;
-            pulse.life = 0;
-            pulse.ring.visible = true;
-            pulse.ring.scale.set(1, 1, 1);
-            pulse.ring.position.set(
-              (Math.random() - 0.5) * 600,
-              (Math.random() - 0.5) * 300,
-              -200 - Math.random() * 600
-            );
-          }
-          return;
-        }
 
-        pulse.life++;
-        const scale = 1 + pulse.life * pulse.speed;
-        pulse.ring.scale.set(scale, scale, scale);
-        const opacity = 0.4 * (1 - pulse.life / pulse.maxLife);
-        (pulse.ring.material as THREE.MeshBasicMaterial).opacity = Math.max(0, opacity);
-
-        if (pulse.life >= pulse.maxLife) {
-          pulse.active = false;
-          pulse.ring.visible = false;
-        }
-      });
 
       // Cosmic dust — turbulent drift
       cosmicDust.rotation.y += 0.0001;
