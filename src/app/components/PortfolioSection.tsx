@@ -64,7 +64,7 @@ const categories: Category[] = [
     color: "from-pink-500/20 to-pink-900/10",
     items: [
       { url: "https://instalacion-dimensiones.vercel.app", label: "Dimensiones" },
-      { url: "https://aura-scanner-bice.vercel.app", label: "Aura Scanner" },
+      { url: "https://aura-scanner-bice.vercel.app?v=2", label: "Aura Scanner" },
       { url: "https://kinetic-poiesis.vercel.app", label: "Kinetic Poiesis" },
       { url: "https://audioreactive-visualizer.vercel.app", label: "Audioreactive" },
       { url: "https://quantum-looper.netlify.app", label: "Quantum Looper" },
