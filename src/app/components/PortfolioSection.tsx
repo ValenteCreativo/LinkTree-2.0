@@ -68,6 +68,7 @@ const categories: Category[] = [
       { url: "https://audioreactive-visualizer.vercel.app", label: "Audioreactive" },
       { url: "https://quantum-looper.netlify.app", label: "Quantum Looper" },
       { url: "https://circulo-de-quintas-one.vercel.app", label: "Círculo de Quintas" },
+      { url: "https://aura-scanner-bice.vercel.app", label: "Aura Scanner" },
     ],
   },
   {
