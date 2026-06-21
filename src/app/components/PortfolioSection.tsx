@@ -92,6 +92,16 @@ const categories: Category[] = [
       { url: "https://bnb-research-commons-five.vercel.app", label: "BNB Research Commons" },
     ],
   },
+  {
+    id: "herramientas",
+    label: "Herramientas",
+    emoji: "🛠️",
+    color: "from-cyan-500/20 to-cyan-900/10",
+    items: [
+      { url: "https://bitacora-pearl.vercel.app/", label: "Bitácora" },
+      { url: "https://orden-os.vercel.app/", label: "OrdenOS" },
+    ],
+  },
 ];
 
 function getScreenshotUrl(url: string): string {
