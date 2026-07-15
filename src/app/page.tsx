@@ -114,10 +114,10 @@ export default function Home() {
 
       {/* Main Content */}
       <div className="relative z-10">
-        <section className="h-screen" />
+        <section className="h-[70vh]" />
 
         {/* Profile Section */}
-        <section className="min-h-screen flex items-start justify-center pt-12 pb-20 px-4">
+        <section className="flex items-start justify-center pt-12 pb-20 px-4">
           <div className="w-full max-w-md">
             <motion.div
               className="bg-black/60 backdrop-blur-sm rounded-2xl p-8 border border-white/5 shadow-2xl"
