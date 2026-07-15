@@ -116,7 +116,7 @@ function getScreenshotUrl(url: string): string {
     "https://aura-scanner-bice.vercel.app": "/aura-scanner-screenshot.png",
     "https://rls-jerusalem-336-ivory.vercel.app": "/rls-jerusalem-screenshot.png",
     "https://inland-mex.vercel.app": "/inlandmex.png",
-    "https://kan-tasejkan.vercel.app": "/kan-tasejkan.png",
+    "https://kan-tasejkan.vercel.app": "/kan-kasejtan.png",
   };
 
   // Check if we have a manual screenshot for this URL
