@@ -33,6 +33,7 @@ const UniverseScene = forwardRef<UniverseSceneHandle, UniverseSceneProps>(({ zoo
   const sceneRef = useRef<THREE.Scene | null>(null);
   const shotCountRef = useRef(0);
   const steerRef = useRef({ x: 0, y: 0 });
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
 
   // Laser beam data
   interface LaserBeam {
@@ -49,53 +50,49 @@ const UniverseScene = forwardRef<UniverseSceneHandle, UniverseSceneProps>(({ zoo
 
   const fire = useCallback(() => {
     const scene = sceneRef.current;
-    if (!scene) return;
+    const camera = cameraRef.current;
+    if (!scene || !camera) return;
 
     console.log("🚀 FIRE! Shot #" + (shotCountRef.current + 1));
 
     shotCountRef.current++;
-    // Pick color palette based on shot count (changes every 3 shots)
     const paletteIndex = Math.floor((shotCountRef.current - 1) / 3) % LASER_COLORS.length;
     const [coreColor, glowColor] = LASER_COLORS[paletteIndex];
 
-    // Fire 2 beams — left and right turrets, wide apart on the ship sides
+    // Get the camera's actual forward direction (where the ship is pointing)
+    const forward = new THREE.Vector3();
+    camera.getWorldDirection(forward);
+
+    // Fire 2 beams — left and right turrets
     const offsets = [-120, 120];
     offsets.forEach((offsetX) => {
-      // Start in front of camera, low and wide (turrets on each side of the ship)
       const startPos = new THREE.Vector3(
         offsetX + (Math.random() - 0.5) * 3,
         20,
         480
       );
 
-      // Velocity converging slightly toward center as they fly to horizon
+      // Velocity = camera forward direction scaled to travel speed
+      // Each turret adds a slight outward spread then converges into the aim direction
+      const speed = 22 + Math.random() * 4;
       const velocity = new THREE.Vector3(
-        -offsetX * 0.02 + (Math.random() - 0.5) * 0.5,
-        (Math.random() - 0.5) * 0.3,
-        -(20 + Math.random() * 5)
+        forward.x * speed + (Math.random() - 0.5) * 0.5,
+        forward.y * speed + (Math.random() - 0.5) * 0.3,
+        forward.z * speed
       );
 
-      // Laser core — elongated cylinder
+      // Laser core
       const laserGeo = new THREE.CylinderGeometry(1.5, 1.0, 50, 8);
       laserGeo.rotateX(Math.PI / 2);
-      const laserMat = new THREE.MeshBasicMaterial({
-        color: coreColor,
-        transparent: true,
-        opacity: 1,
-      });
+      const laserMat = new THREE.MeshBasicMaterial({ color: coreColor, transparent: true, opacity: 1 });
       const laserMesh = new THREE.Mesh(laserGeo, laserMat);
       laserMesh.position.copy(startPos);
       scene.add(laserMesh);
 
-      // Glow around laser
+      // Glow
       const glowGeo = new THREE.CylinderGeometry(5, 4, 55, 8);
       glowGeo.rotateX(Math.PI / 2);
-      const glowMat = new THREE.MeshBasicMaterial({
-        color: glowColor,
-        transparent: true,
-        opacity: 0.4,
-        blending: THREE.AdditiveBlending,
-      });
+      const glowMat = new THREE.MeshBasicMaterial({ color: glowColor, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending });
       const glowMesh = new THREE.Mesh(glowGeo, glowMat);
       glowMesh.position.copy(startPos);
       scene.add(glowMesh);
@@ -140,6 +137,7 @@ const UniverseScene = forwardRef<UniverseSceneHandle, UniverseSceneProps>(({ zoo
     );
     camera.position.set(0, 80, 500);
     camera.lookAt(0, 0, 0);
+    cameraRef.current = camera;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -990,8 +988,8 @@ const UniverseScene = forwardRef<UniverseSceneHandle, UniverseSceneProps>(({ zoo
       // =============================================
       // Ship sway offset — lasers inherit the ship's drift + joystick steering
       const steerNow = steerRef.current;
-      const shipSwayX = 0.15 * Math.cos(elapsed * 0.12) + 0.08 * Math.cos(elapsed * 0.28) + steerNow.x * 0.6;
-      const shipSwayY = 0.08 * Math.sin(elapsed * 0.09) + 0.04 * Math.cos(elapsed * 0.18) + steerNow.y * 0.4;
+      const shipSwayX = 0.15 * Math.cos(elapsed * 0.12) + 0.08 * Math.cos(elapsed * 0.28) + steerNow.x * 2.5;
+      const shipSwayY = 0.08 * Math.sin(elapsed * 0.09) + 0.04 * Math.cos(elapsed * 0.18) + steerNow.y * 1.8;
 
       const lasers = lasersRef.current;
       for (let i = lasers.length - 1; i >= 0; i--) {
