@@ -189,7 +189,7 @@ export default function Home() {
   }, [handleJoystickMove, handleJoystickEnd]);
 
   return (
-    <main className="relative min-h-screen font-[var(--font-geist-sans)]">
+    <main className="relative font-[var(--font-geist-sans)]">
       {/* 3D Universe Background */}
       <PortalScene ref={sceneRef} zoom={scrollProgress} />
 
