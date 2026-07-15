@@ -33,11 +33,11 @@ const profile = {
   title: "Valentín Martínez",
   banner: "Technology Developer for Social & Environmental Impact",
   links: [
+    { title: "TA'AK Studio", url: "https://taak-studio.bubbleapps.io/version-test" },
     { title: "GitHub", url: "https://github.com/ValenteCreativo" },
     { title: "Programación Creativa", url: "https://codepen.io/ValenteCreativo" },
     { title: "Blog Literario", url: "https://valentinmartinezmx.wixsite.com/ideas/blog" },
     { title: "Blog Técnico", url: "https://medium.com/@geovalente" },
-    { title: "TA'AK Studio", url: "https://taak-studio.bubbleapps.io/version-test" },
   ],
   hackathons: [
     { title: "Devpost", url: "https://devpost.com/ValenteCreativo" },
