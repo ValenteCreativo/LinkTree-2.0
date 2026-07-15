@@ -216,7 +216,7 @@ export default function Home() {
 
       {/* FIRE BUTTON — cockpit panel style */}
       <div
-        className="fixed bottom-[12%] md:bottom-[9%] z-[9999] pointer-events-auto right-[18%] md:right-[calc(50%-120px)]"
+        className="fixed bottom-[12%] md:bottom-[9%] z-[9999] pointer-events-auto right-[calc(50%-60px)] md:right-[calc(50%-200px)]"
         style={{
           opacity: Math.max(0, 1 - scrollProgress * 3),
         }}
@@ -226,7 +226,7 @@ export default function Home() {
           onTouchEnd={(e) => { e.preventDefault(); handleFire(); }}
           className={`
             relative group
-            w-10 h-10 md:w-8 md:h-8 rounded-full
+            w-10 h-10 md:w-10 md:h-10 rounded-full
             bg-[#0a1a1a]/80
             border border-[#1a3a3a]/80
             shadow-[0_0_4px_rgba(0,180,180,0.15),inset_0_0_3px_rgba(0,100,100,0.2)]
@@ -241,9 +241,9 @@ export default function Home() {
           style={{ touchAction: "none" }}
           aria-label="Fire lasers"
         >
-          <div className="absolute inset-[3px] md:inset-[2px] rounded-full border border-[#0f4040]/60" />
+          <div className="absolute inset-[3px] rounded-full border border-[#0f4040]/60" />
           <svg
-            className="relative text-[#40b0a0]/70 group-hover:text-[#60e0d0] transition-colors w-4 h-4 md:w-3 md:h-3"
+            className="relative text-[#40b0a0]/70 group-hover:text-[#60e0d0] transition-colors w-4 h-4"
             viewBox="0 0 24 24"
             fill="none"
           >
@@ -255,7 +255,7 @@ export default function Home() {
 
       {/* JOYSTICK — cockpit panel style */}
       <div
-        className="fixed bottom-[12%] md:bottom-[9%] z-[9999] pointer-events-auto left-[18%] md:left-[calc(50%-120px)]"
+        className="fixed bottom-[12%] md:bottom-[9%] z-[9999] pointer-events-auto left-[calc(50%-60px)] md:left-[calc(50%-200px)]"
         style={{
           opacity: Math.max(0, 1 - scrollProgress * 3),
         }}
@@ -270,16 +270,16 @@ export default function Home() {
               joystickTouchId.current = e.touches[0].identifier;
             }
           }}
-          className="relative w-12 h-12 md:w-9 md:h-9 rounded-full bg-[#0a1a1a]/80 border border-[#1a3a3a]/80 shadow-[0_0_4px_rgba(0,180,180,0.1),inset_0_0_6px_rgba(0,60,60,0.3)] cursor-grab active:cursor-grabbing flex items-center justify-center"
+          className="relative w-12 h-12 md:w-11 md:h-11 rounded-full bg-[#0a1a1a]/80 border border-[#1a3a3a]/80 shadow-[0_0_4px_rgba(0,180,180,0.1),inset_0_0_6px_rgba(0,60,60,0.3)] cursor-grab active:cursor-grabbing flex items-center justify-center"
           style={{ touchAction: "none" }}
         >
           {/* Crosshair lines — teal glow */}
-          <div className="absolute w-[1px] h-5 md:h-4 bg-[#2a6060]/40" />
-          <div className="absolute w-5 md:w-4 h-[1px] bg-[#2a6060]/40" />
+          <div className="absolute w-[1px] h-5 bg-[#2a6060]/40" />
+          <div className="absolute w-5 h-[1px] bg-[#2a6060]/40" />
 
           {/* Joystick knob */}
           <div
-            className="absolute w-5 h-5 md:w-3.5 md:h-3.5 rounded-full bg-[#0d2828] border border-[#2a5a5a]/70 shadow-[0_0_4px_rgba(0,150,130,0.2)] transition-transform duration-75"
+            className="absolute w-5 h-5 md:w-4 md:h-4 rounded-full bg-[#0d2828] border border-[#2a5a5a]/70 shadow-[0_0_4px_rgba(0,150,130,0.2)] transition-transform duration-75"
             style={{
               transform: `translate(${joystickPos.x}px, ${joystickPos.y}px)`,
             }}
