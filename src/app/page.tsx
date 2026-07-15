@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import PortalScene from "./components/portalscene";
+import PortalScene, { UniverseSceneHandle } from "./components/portalscene";
 import PortfolioSection from "./components/PortfolioSection";
 import {
   FaInstagram,
@@ -63,6 +63,11 @@ export default function Home() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [tab, setTab] = useState<"personal" | "portfolio">("personal");
   const [hackathonsOpen, setHackathonsOpen] = useState(false);
+  const [isFiring, setIsFiring] = useState(false);
+  const [joystickPos, setJoystickPos] = useState({ x: 0, y: 0 });
+  const sceneRef = useRef<UniverseSceneHandle>(null);
+  const joystickRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -74,10 +79,97 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handleFire = () => {
+    if (sceneRef.current) {
+      sceneRef.current.fire();
+      setIsFiring(true);
+      setTimeout(() => setIsFiring(false), 150);
+    }
+  };
+
+  // Joystick logic
+  const JOYSTICK_RADIUS = 18; // max movement in px
+
+  const handleJoystickMove = useCallback((clientX: number, clientY: number) => {
+    if (!joystickRef.current || !isDragging.current) return;
+    const rect = joystickRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    let dx = clientX - centerX;
+    let dy = clientY - centerY;
+
+    // Clamp to radius
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > JOYSTICK_RADIUS) {
+      dx = (dx / dist) * JOYSTICK_RADIUS;
+      dy = (dy / dist) * JOYSTICK_RADIUS;
+    }
+
+    // Normalize to -1..1
+    const nx = dx / JOYSTICK_RADIUS;
+    const ny = dy / JOYSTICK_RADIUS;
+
+    setJoystickPos({ x: dx, y: dy });
+    if (sceneRef.current) {
+      sceneRef.current.steer(nx, ny);
+    }
+  }, []);
+
+  const handleJoystickEnd = useCallback(() => {
+    isDragging.current = false;
+    // Don't snap to center — let the animation loop ease it back
+  }, []);
+
+  // Smooth return to center when not dragging
+  useEffect(() => {
+    let animId: number;
+    const ease = () => {
+      if (!isDragging.current) {
+        setJoystickPos((prev) => {
+          const nx = prev.x * 0.97;
+          const ny = prev.y * 0.97;
+          // Stop when close enough
+          if (Math.abs(nx) < 0.3 && Math.abs(ny) < 0.3) {
+            if (sceneRef.current) sceneRef.current.steer(0, 0);
+            return { x: 0, y: 0 };
+          }
+          if (sceneRef.current) {
+            sceneRef.current.steer(nx / JOYSTICK_RADIUS, ny / JOYSTICK_RADIUS);
+          }
+          return { x: nx, y: ny };
+        });
+      }
+      animId = requestAnimationFrame(ease);
+    };
+    animId = requestAnimationFrame(ease);
+    return () => cancelAnimationFrame(animId);
+  }, []);
+
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => handleJoystickMove(e.clientX, e.clientY);
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) handleJoystickMove(e.touches[0].clientX, e.touches[0].clientY);
+    };
+    const onEnd = () => handleJoystickEnd();
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onEnd);
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("touchend", onEnd);
+
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onEnd);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onEnd);
+    };
+  }, [handleJoystickMove, handleJoystickEnd]);
+
   return (
     <main className="relative min-h-screen font-[var(--font-geist-sans)]">
       {/* 3D Universe Background */}
-      <PortalScene zoom={scrollProgress} />
+      <PortalScene ref={sceneRef} zoom={scrollProgress} />
 
       {/* Background Image Layer — subtle zoom + fade */}
       <div
@@ -97,6 +189,77 @@ export default function Home() {
             alt="Background"
             className="w-full h-full object-cover"
           />
+        </div>
+      </div>
+
+      {/* FIRE BUTTON — cockpit panel style */}
+      <div
+        className="fixed bottom-[8%] left-1/2 z-[9999] pointer-events-auto"
+        style={{
+          opacity: Math.max(0, 1 - scrollProgress * 3),
+          transform: "translateX(calc(-50% + 88px)) translateY(-6px)",
+        }}
+      >
+        <button
+          onClick={handleFire}
+          className={`
+            relative group
+            w-5 h-5 rounded-full
+            bg-[#0a1a1a]/80
+            border border-[#1a3a3a]/80
+            shadow-[0_0_4px_rgba(0,180,180,0.15),inset_0_0_3px_rgba(0,100,100,0.2)]
+            flex items-center justify-center
+            cursor-pointer
+            hover:shadow-[0_0_8px_rgba(0,200,200,0.3),inset_0_0_4px_rgba(0,150,150,0.3)]
+            hover:border-[#2a5a5a]/80
+            active:scale-90 active:shadow-[0_0_12px_rgba(0,255,200,0.5)]
+            transition-all duration-100
+            ${isFiring ? "scale-90 shadow-[0_0_14px_rgba(0,255,200,0.6)] border-[#3a7a7a]" : ""}
+          `}
+          aria-label="Fire lasers"
+        >
+          {/* Inner glow ring */}
+          <div className="absolute inset-[2px] rounded-full border border-[#0f4040]/60" />
+          <svg
+            width="8"
+            height="8"
+            viewBox="0 0 24 24"
+            fill="none"
+            className="relative text-[#40b0a0]/70 group-hover:text-[#60e0d0] transition-colors"
+          >
+            <circle cx="12" cy="12" r="3" fill="currentColor" />
+            <path d="M12 2V6M12 18V22M2 12H6M18 12H22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+        </button>
+      </div>
+
+      {/* JOYSTICK — cockpit panel style */}
+      <div
+        className="fixed bottom-[8%] left-1/2 z-[9999] pointer-events-auto"
+        style={{
+          opacity: Math.max(0, 1 - scrollProgress * 3),
+          transform: "translateX(calc(-50% - 100px)) translateY(0px)",
+        }}
+      >
+        <div
+          ref={joystickRef}
+          onMouseDown={() => { isDragging.current = true; }}
+          onTouchStart={() => { isDragging.current = true; }}
+          className="relative w-7 h-7 rounded-full bg-[#0a1a1a]/80 border border-[#1a3a3a]/80 shadow-[0_0_4px_rgba(0,180,180,0.1),inset_0_0_6px_rgba(0,60,60,0.3)] cursor-grab active:cursor-grabbing flex items-center justify-center"
+        >
+          {/* Crosshair lines — teal glow */}
+          <div className="absolute w-[1px] h-3 bg-[#2a6060]/40" />
+          <div className="absolute w-3 h-[1px] bg-[#2a6060]/40" />
+
+          {/* Joystick knob */}
+          <div
+            className="absolute w-[10px] h-[10px] rounded-full bg-[#0d2828] border border-[#2a5a5a]/70 shadow-[0_0_4px_rgba(0,150,130,0.2)] transition-transform duration-75"
+            style={{
+              transform: `translate(${joystickPos.x}px, ${joystickPos.y}px)`,
+            }}
+          >
+            <div className="absolute inset-[2px] rounded-full bg-[#1a4040]/80" />
+          </div>
         </div>
       </div>
 
