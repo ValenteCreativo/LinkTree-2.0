@@ -303,7 +303,7 @@ export default function Home() {
 
       {/* Main Content */}
       <div className="relative z-10">
-        <section className="h-[40vh] md:h-screen" />
+        <section className="h-screen" />
 
         {/* Profile Section */}
         <section className="flex items-start justify-center pt-12 pb-8 px-4">
