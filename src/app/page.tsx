@@ -88,7 +88,8 @@ export default function Home() {
   };
 
   // Joystick logic
-  const JOYSTICK_RADIUS = 18; // max movement in px
+  const JOYSTICK_RADIUS = 22; // max movement in px
+  const joystickTouchId = useRef<number | null>(null);
 
   const handleJoystickMove = useCallback((clientX: number, clientY: number) => {
     if (!joystickRef.current || !isDragging.current) return;
@@ -118,6 +119,7 @@ export default function Home() {
 
   const handleJoystickEnd = useCallback(() => {
     isDragging.current = false;
+    joystickTouchId.current = null;
     // Don't snap to center — let the animation loop ease it back
   }, []);
 
@@ -149,20 +151,40 @@ export default function Home() {
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => handleJoystickMove(e.clientX, e.clientY);
     const onTouchMove = (e: TouchEvent) => {
-      if (e.touches.length > 0) handleJoystickMove(e.touches[0].clientX, e.touches[0].clientY);
+      // Find the touch that started on the joystick
+      for (let i = 0; i < e.touches.length; i++) {
+        if (e.touches[i].identifier === joystickTouchId.current) {
+          e.preventDefault(); // prevent scroll
+          handleJoystickMove(e.touches[i].clientX, e.touches[i].clientY);
+          break;
+        }
+      }
     };
-    const onEnd = () => handleJoystickEnd();
+    const onTouchEnd = (e: TouchEvent) => {
+      // Only end if our tracked touch was released
+      let found = false;
+      for (let i = 0; i < e.touches.length; i++) {
+        if (e.touches[i].identifier === joystickTouchId.current) {
+          found = true;
+          break;
+        }
+      }
+      if (!found && isDragging.current) {
+        handleJoystickEnd();
+      }
+    };
+    const onMouseUp = () => handleJoystickEnd();
 
     window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onEnd);
-    window.addEventListener("touchmove", onTouchMove, { passive: true });
-    window.addEventListener("touchend", onEnd);
+    window.addEventListener("mouseup", onMouseUp);
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
+    window.addEventListener("touchend", onTouchEnd);
 
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onEnd);
+      window.removeEventListener("mouseup", onMouseUp);
       window.removeEventListener("touchmove", onTouchMove);
-      window.removeEventListener("touchend", onEnd);
+      window.removeEventListener("touchend", onTouchEnd);
     };
   }, [handleJoystickMove, handleJoystickEnd]);
 
@@ -194,17 +216,17 @@ export default function Home() {
 
       {/* FIRE BUTTON — cockpit panel style */}
       <div
-        className="fixed bottom-[8%] left-1/2 z-[9999] pointer-events-auto"
+        className="fixed bottom-[12%] md:bottom-[9%] z-[9999] pointer-events-auto right-[18%] md:right-[calc(50%-120px)]"
         style={{
           opacity: Math.max(0, 1 - scrollProgress * 3),
-          transform: "translateX(calc(-50% + 88px)) translateY(-6px)",
         }}
       >
         <button
           onClick={handleFire}
+          onTouchEnd={(e) => { e.preventDefault(); handleFire(); }}
           className={`
             relative group
-            w-5 h-5 rounded-full
+            w-10 h-10 md:w-8 md:h-8 rounded-full
             bg-[#0a1a1a]/80
             border border-[#1a3a3a]/80
             shadow-[0_0_4px_rgba(0,180,180,0.15),inset_0_0_3px_rgba(0,100,100,0.2)]
@@ -216,16 +238,14 @@ export default function Home() {
             transition-all duration-100
             ${isFiring ? "scale-90 shadow-[0_0_14px_rgba(0,255,200,0.6)] border-[#3a7a7a]" : ""}
           `}
+          style={{ touchAction: "none" }}
           aria-label="Fire lasers"
         >
-          {/* Inner glow ring */}
-          <div className="absolute inset-[2px] rounded-full border border-[#0f4040]/60" />
+          <div className="absolute inset-[3px] md:inset-[2px] rounded-full border border-[#0f4040]/60" />
           <svg
-            width="8"
-            height="8"
+            className="relative text-[#40b0a0]/70 group-hover:text-[#60e0d0] transition-colors w-4 h-4 md:w-3 md:h-3"
             viewBox="0 0 24 24"
             fill="none"
-            className="relative text-[#40b0a0]/70 group-hover:text-[#60e0d0] transition-colors"
           >
             <circle cx="12" cy="12" r="3" fill="currentColor" />
             <path d="M12 2V6M12 18V22M2 12H6M18 12H22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -235,25 +255,31 @@ export default function Home() {
 
       {/* JOYSTICK — cockpit panel style */}
       <div
-        className="fixed bottom-[8%] left-1/2 z-[9999] pointer-events-auto"
+        className="fixed bottom-[12%] md:bottom-[9%] z-[9999] pointer-events-auto left-[18%] md:left-[calc(50%-120px)]"
         style={{
           opacity: Math.max(0, 1 - scrollProgress * 3),
-          transform: "translateX(calc(-50% - 100px)) translateY(0px)",
         }}
       >
         <div
           ref={joystickRef}
           onMouseDown={() => { isDragging.current = true; }}
-          onTouchStart={() => { isDragging.current = true; }}
-          className="relative w-7 h-7 rounded-full bg-[#0a1a1a]/80 border border-[#1a3a3a]/80 shadow-[0_0_4px_rgba(0,180,180,0.1),inset_0_0_6px_rgba(0,60,60,0.3)] cursor-grab active:cursor-grabbing flex items-center justify-center"
+          onTouchStart={(e) => {
+            e.preventDefault();
+            isDragging.current = true;
+            if (e.touches.length > 0) {
+              joystickTouchId.current = e.touches[0].identifier;
+            }
+          }}
+          className="relative w-12 h-12 md:w-9 md:h-9 rounded-full bg-[#0a1a1a]/80 border border-[#1a3a3a]/80 shadow-[0_0_4px_rgba(0,180,180,0.1),inset_0_0_6px_rgba(0,60,60,0.3)] cursor-grab active:cursor-grabbing flex items-center justify-center"
+          style={{ touchAction: "none" }}
         >
           {/* Crosshair lines — teal glow */}
-          <div className="absolute w-[1px] h-3 bg-[#2a6060]/40" />
-          <div className="absolute w-3 h-[1px] bg-[#2a6060]/40" />
+          <div className="absolute w-[1px] h-5 md:h-4 bg-[#2a6060]/40" />
+          <div className="absolute w-5 md:w-4 h-[1px] bg-[#2a6060]/40" />
 
           {/* Joystick knob */}
           <div
-            className="absolute w-[10px] h-[10px] rounded-full bg-[#0d2828] border border-[#2a5a5a]/70 shadow-[0_0_4px_rgba(0,150,130,0.2)] transition-transform duration-75"
+            className="absolute w-5 h-5 md:w-3.5 md:h-3.5 rounded-full bg-[#0d2828] border border-[#2a5a5a]/70 shadow-[0_0_4px_rgba(0,150,130,0.2)] transition-transform duration-75"
             style={{
               transform: `translate(${joystickPos.x}px, ${joystickPos.y}px)`,
             }}
