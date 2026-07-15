@@ -55,6 +55,9 @@ const categories: Category[] = [
       { url: "https://rls-jerusalem-336-ivory.vercel.app/", label: "RLS Jerusalem" },
       { url: "https://patrimo.pro", label: "Patrimo" },
       { url: "https://www.patas4land.xyz", label: "Patas4Land" },
+      { url: "https://mindfulverso-zeta.vercel.app/", label: "Mindfulverso" },
+      { url: "https://kan-tasejkan.vercel.app/", label: "Kan Tasejkan" },
+      { url: "https://inland-mex.vercel.app/", label: "Inland Mex" },
     ],
   },
   {
