@@ -216,7 +216,7 @@ export default function Home() {
 
       {/* FIRE BUTTON — cockpit panel style */}
       <div
-        className="fixed bottom-[12%] md:bottom-[9%] z-[9999] pointer-events-auto right-[calc(50%-60px)] md:right-[calc(50%-200px)]"
+        className="fixed bottom-[12%] md:bottom-[9%] z-[9999] pointer-events-auto right-[8%] md:right-[calc(50%-200px)]"
         style={{
           opacity: Math.max(0, 1 - scrollProgress * 3),
         }}
@@ -255,7 +255,7 @@ export default function Home() {
 
       {/* JOYSTICK — cockpit panel style */}
       <div
-        className="fixed bottom-[12%] md:bottom-[9%] z-[9999] pointer-events-auto left-[calc(50%-60px)] md:left-[calc(50%-200px)]"
+        className="fixed bottom-[12%] md:bottom-[9%] z-[9999] pointer-events-auto left-[8%] md:left-[calc(50%-200px)]"
         style={{
           opacity: Math.max(0, 1 - scrollProgress * 3),
         }}
