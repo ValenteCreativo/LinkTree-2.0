@@ -50,14 +50,14 @@ const categories: Category[] = [
     emoji: "💼",
     color: "from-amber-500/20 to-amber-900/10",
     items: [
+      { url: "https://inland-mex.vercel.app/", label: "Inland Mex" },
+      { url: "https://kan-tasejkan.vercel.app/", label: "Kan Tasejkan" },
+      { url: "https://mindfulverso-zeta.vercel.app/", label: "Mindfulverso" },
       { url: "https://martina-store-2.vercel.app", label: "Martina Store" },
-      { url: "https://rizoma-shipyard-ynwq.vercel.app", label: "Rizoma" },
       { url: "https://rls-jerusalem-336-ivory.vercel.app/", label: "RLS Jerusalem" },
       { url: "https://patrimo.pro", label: "Patrimo" },
+      { url: "https://rizoma-shipyard-ynwq.vercel.app", label: "Rizoma" },
       { url: "https://www.patas4land.xyz", label: "Patas4Land" },
-      { url: "https://mindfulverso-zeta.vercel.app/", label: "Mindfulverso" },
-      { url: "https://kan-tasejkan.vercel.app/", label: "Kan Tasejkan" },
-      { url: "https://inland-mex.vercel.app/", label: "Inland Mex" },
     ],
   },
   {
@@ -115,6 +115,8 @@ function getScreenshotUrl(url: string): string {
     "https://aura-tau-five.vercel.app": "/aura-screenshot.png",
     "https://aura-scanner-bice.vercel.app": "/aura-scanner-screenshot.png",
     "https://rls-jerusalem-336-ivory.vercel.app": "/rls-jerusalem-screenshot.png",
+    "https://inland-mex.vercel.app": "/inlandmex.png",
+    "https://kan-tasejkan.vercel.app": "/kan-tasejkan.png",
   };
 
   // Check if we have a manual screenshot for this URL
