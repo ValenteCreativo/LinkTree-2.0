@@ -63,17 +63,22 @@ const UniverseScene = forwardRef<UniverseSceneHandle, UniverseSceneProps>(({ zoo
     const forward = new THREE.Vector3();
     camera.getWorldDirection(forward);
 
+    // Camera right and up vectors for turret offset
+    const right = new THREE.Vector3();
+    right.crossVectors(forward, camera.up).normalize();
+    const up = new THREE.Vector3();
+    up.crossVectors(right, forward).normalize();
+
     // Fire 2 beams — left and right turrets
-    const offsets = [-120, 120];
-    offsets.forEach((offsetX) => {
-      const startPos = new THREE.Vector3(
-        offsetX + (Math.random() - 0.5) * 3,
-        20,
-        480
-      );
+    const offsets = [-1, 1];
+    offsets.forEach((side) => {
+      // Spawn at camera position, offset sideways and slightly below by turret distance
+      const startPos = camera.position.clone()
+        .addScaledVector(right, side * 25)   // wide apart left/right
+        .addScaledVector(up, -15)             // below camera (turret position)
+        .addScaledVector(forward, -20);       // slightly behind camera plane
 
       // Velocity = camera forward direction scaled to travel speed
-      // Each turret adds a slight outward spread then converges into the aim direction
       const speed = 22 + Math.random() * 4;
       const velocity = new THREE.Vector3(
         forward.x * speed + (Math.random() - 0.5) * 0.5,
