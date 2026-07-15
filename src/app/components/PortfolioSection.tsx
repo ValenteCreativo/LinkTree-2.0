@@ -117,6 +117,7 @@ function getScreenshotUrl(url: string): string {
     "https://rls-jerusalem-336-ivory.vercel.app": "/rls-jerusalem-screenshot.png",
     "https://inland-mex.vercel.app": "/inlandmex.png",
     "https://kan-tasejkan.vercel.app": "/kan-kasejtan.png",
+    "https://instalacion-dimensiones.vercel.app": "/Dimensiones.png",
   };
 
   // Check if we have a manual screenshot for this URL
