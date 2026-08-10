@@ -15,9 +15,13 @@ declare module "three/examples/jsm/postprocessing/EffectComposer" {
     import { WebGLRenderer, Scene, Camera, WebGLRenderTarget } from "three";
     export class EffectComposer {
       constructor(renderer: WebGLRenderer, renderTarget?: WebGLRenderTarget);
+      renderToScreen: boolean;
+      renderTarget1: WebGLRenderTarget;
+      renderTarget2: WebGLRenderTarget;
       addPass(pass: any): void;
       render(delta?: number): void;
       setSize(width: number, height: number): void;
+      setPixelRatio(ratio: number): void;
     }
   }
   
@@ -92,3 +96,19 @@ declare module "three/examples/jsm/postprocessing/EffectComposer" {
     };
   }
   
+
+declare module "three/examples/jsm/shaders/GammaCorrectionShader" {
+  export const GammaCorrectionShader: {
+    uniforms: Record<string, { value: any }>;
+    vertexShader: string;
+    fragmentShader: string;
+  };
+}
+
+declare module "three/examples/jsm/shaders/CopyShader" {
+  export const CopyShader: {
+    uniforms: Record<string, { value: any }>;
+    vertexShader: string;
+    fragmentShader: string;
+  };
+}

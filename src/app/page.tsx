@@ -2,8 +2,11 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import dynamic from "next/dynamic";
 import PortalScene, { UniverseSceneHandle } from "./components/portalscene";
 import PortfolioSection from "./components/PortfolioSection";
+
+const WormholeScene = dynamic(() => import("./components/WormholeScene"), { ssr: false });
 import {
   FaInstagram,
   FaTwitter,
@@ -33,7 +36,7 @@ const profile = {
   title: "Valentín Martínez",
   banner: "Technology Developer for Social & Environmental Impact",
   links: [
-    { title: "TA'AK Studio", url: "https://taak-studio1.vercel.app/" },
+    { title: "TA'AK Studio", url: "http://taak-studio.cc/" },
     { title: "GitHub", url: "https://github.com/ValenteCreativo" },
     { title: "Programación Creativa", url: "https://codepen.io/ValenteCreativo" },
     { title: "Blog Literario", url: "https://valentinmartinezmx.wixsite.com/ideas/blog" },
@@ -64,8 +67,11 @@ export default function Home() {
   const [tab, setTab] = useState<"personal" | "portfolio">("personal");
   const [hackathonsOpen, setHackathonsOpen] = useState(false);
   const [isFiring, setIsFiring] = useState(false);
+  const [isWarping, setIsWarping] = useState(false);
+  const [showWormhole, setShowWormhole] = useState(false);
   const [joystickPos, setJoystickPos] = useState({ x: 0, y: 0 });
   const sceneRef = useRef<UniverseSceneHandle>(null);
+  const warpTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const joystickRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
 
@@ -85,6 +91,18 @@ export default function Home() {
       setIsFiring(true);
       setTimeout(() => setIsFiring(false), 150);
     }
+  };
+
+  const handleSpeed = () => {
+    if (isWarping) return; // already in warp
+    setIsWarping(true);
+    setShowWormhole(true);
+    // Warp lasts 8 seconds then fades back
+    warpTimeoutRef.current = setTimeout(() => {
+      setShowWormhole(false);
+      // Small delay for fade-out before resetting state
+      setTimeout(() => setIsWarping(false), 800);
+    }, 8000);
   };
 
   // Joystick logic
@@ -193,6 +211,21 @@ export default function Home() {
       {/* 3D Universe Background */}
       <PortalScene ref={sceneRef} zoom={scrollProgress} />
 
+      {/* Wormhole Speed Scene — overlays when warping */}
+      <AnimatePresence>
+        {showWormhole && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="fixed inset-0 z-[2]"
+          >
+            <WormholeScene />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Background Image Layer — subtle zoom + fade */}
       <div
         className="fixed top-0 left-0 w-full h-full z-[5] pointer-events-none transition-opacity duration-700 ease-out"
@@ -212,6 +245,47 @@ export default function Home() {
             className="w-full h-full object-cover"
           />
         </div>
+      </div>
+
+      {/* SPEED BUTTON — wormhole warp, centered on mandala */}
+      <div
+        className="fixed bottom-[27%] md:bottom-[24%] left-[calc(50%-5px)] -translate-x-1/2 z-[9999] pointer-events-auto"
+        style={{
+          opacity: Math.max(0, 1 - scrollProgress * 3),
+        }}
+      >
+        <button
+          onClick={handleSpeed}
+          onTouchEnd={(e) => { e.preventDefault(); handleSpeed(); }}
+          disabled={isWarping}
+          className={`
+            relative group
+            w-11 h-11 md:w-10 md:h-10 rounded-full
+            bg-[#0a1a1a]/80
+            border border-[#1a3a3a]/80
+            shadow-[0_0_4px_rgba(0,180,180,0.15),inset_0_0_3px_rgba(0,100,100,0.2)]
+            flex items-center justify-center
+            cursor-pointer
+            hover:shadow-[0_0_8px_rgba(120,60,255,0.4),inset_0_0_4px_rgba(120,60,255,0.3)]
+            hover:border-[#5a3a8a]/80
+            active:scale-90 active:shadow-[0_0_14px_rgba(120,60,255,0.6)]
+            transition-all duration-100
+            disabled:opacity-40 disabled:cursor-not-allowed
+            ${isWarping ? "scale-90 shadow-[0_0_16px_rgba(43,240,255,0.7)] border-[#2bf0ff]/60 animate-pulse" : ""}
+          `}
+          style={{ touchAction: "none" }}
+          aria-label="Warp speed"
+        >
+          <div className="absolute inset-[3px] rounded-full border border-[#2a1a4a]/60" />
+          <svg
+            className={`relative w-4 h-4 transition-colors ${isWarping ? "text-[#2bf0ff]" : "text-[#7a3cff]/70 group-hover:text-[#a060ff]"}`}
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            {/* Speed/lightning bolt icon */}
+            <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" fill="currentColor" />
+          </svg>
+        </button>
       </div>
 
       {/* FIRE BUTTON — cockpit panel style */}
