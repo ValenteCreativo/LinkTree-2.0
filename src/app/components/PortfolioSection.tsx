@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 type PortfolioItem = {
   url: string;
   label: string;
+  image: string;
 };
 
 type Category = {
@@ -18,16 +19,34 @@ type Category = {
 
 const categories: Category[] = [
   {
+    id: "cliente",
+    label: "Clientes",
+    emoji: "💼",
+    color: "from-amber-500/20 to-amber-900/10",
+    items: [
+      { url: "https://maestria-culinaria-fast.vercel.app", label: "Maestría Culinaria", image: "/maestria-culinaria-screenshot.webp" },
+      { url: "https://ecotourmex.vercel.app", label: "Ecotourmex", image: "/ecotour-screenshot.webp" },
+      { url: "https://kostik.mx", label: "Kostik", image: "/kostik-screenshot.webp" },
+      { url: "https://inland-mex.vercel.app", label: "Inland Mex", image: "/inlandmex-preview.webp" },
+      { url: "https://kan-tasejkan.vercel.app", label: "Kan Tasejkan", image: "/kan-kasejtan-preview.webp" },
+      { url: "https://mindfulverso-zeta.vercel.app", label: "Mindfulverso", image: "/mindfulverso-front.webp" },
+      { url: "https://martina-store-2.vercel.app", label: "Martina Store", image: "/martina-store-front.webp" },
+      { url: "https://rls-jerusalem-336-ivory.vercel.app", label: "RLS Jerusalem", image: "/rls-jerusalem-screenshot-preview.webp" },
+      { url: "https://patrimo.pro", label: "Patrimo", image: "/patrimo-front.webp" },
+      { url: "https://rizoma-shipyard-ynwq.vercel.app", label: "Rizoma", image: "/rizoma-front.webp" },
+    ],
+  },
+  {
     id: "ambiental",
     label: "Impacto Ambiental",
     emoji: "🌱",
     color: "from-green-500/20 to-green-900/10",
     items: [
-      { url: "https://aura-tau-five.vercel.app", label: "Aura" },
-      { url: "https://arvi-eight.vercel.app", label: "Arvi" },
-      { url: "https://aona.vercel.app", label: "Aona" },
-      { url: "https://sen-network1.vercel.app", label: "SEN Network" },
-      { url: "https://rembu-app.vercel.app", label: "Rembu" },
+      { url: "https://aura-tau-five.vercel.app", label: "Aura", image: "/aura-screenshot-preview.webp" },
+      { url: "https://arvi-eight.vercel.app", label: "Arvi", image: "/arvi-screenshot-preview.webp" },
+      { url: "https://aona.vercel.app", label: "Aona", image: "/aona-front.webp" },
+      { url: "https://sen-network1.vercel.app", label: "SEN Network", image: "/sen-network-front.webp" },
+      { url: "https://rembu-app.vercel.app", label: "Rembu", image: "/rembu-front.webp" },
     ],
   },
   {
@@ -36,28 +55,12 @@ const categories: Category[] = [
     emoji: "🤝",
     color: "from-blue-500/20 to-blue-900/10",
     items: [
-      { url: "https://care-pilot-nu.vercel.app", label: "CarePilot" },
-      { url: "https://seedr-three.vercel.app", label: "Seedr" },
-      { url: "https://www.side-b.art", label: "Side-B" },
-      { url: "https://sigilo-zeta.vercel.app", label: "Sigilo" },
-      { url: "https://supply-cycle.vercel.app", label: "Supply Cycle" },
-      { url: "https://bitbitmami.netlify.app", label: "BitBitMami" },
-    ],
-  },
-  {
-    id: "cliente",
-    label: "Clientes",
-    emoji: "💼",
-    color: "from-amber-500/20 to-amber-900/10",
-    items: [
-      { url: "https://inland-mex.vercel.app/", label: "Inland Mex" },
-      { url: "https://kan-tasejkan.vercel.app/", label: "Kan Tasejkan" },
-      { url: "https://mindfulverso-zeta.vercel.app/", label: "Mindfulverso" },
-      { url: "https://martina-store-2.vercel.app", label: "Martina Store" },
-      { url: "https://rls-jerusalem-336-ivory.vercel.app/", label: "RLS Jerusalem" },
-      { url: "https://patrimo.pro", label: "Patrimo" },
-      { url: "https://rizoma-shipyard-ynwq.vercel.app", label: "Rizoma" },
-      { url: "https://www.patas4land.xyz", label: "Patas4Land" },
+      { url: "https://care-pilot-nu.vercel.app", label: "CarePilot", image: "/care-pilot-screenshot-preview.webp" },
+      { url: "https://seedr-three.vercel.app", label: "Seedr", image: "/seedr-front.webp" },
+      { url: "https://www.side-b.art", label: "Side-B", image: "/side-b-front.webp" },
+      { url: "https://sigilo-zeta.vercel.app", label: "Sigilo", image: "/sigilo-front.webp" },
+      { url: "https://supply-cycle.vercel.app", label: "Supply Cycle", image: "/supply-cycle-front.webp" },
+      { url: "https://bitbitmami.netlify.app", label: "BitBitMami", image: "/bitbitmami-front.webp" },
     ],
   },
   {
@@ -66,12 +69,12 @@ const categories: Category[] = [
     emoji: "🎨",
     color: "from-pink-500/20 to-pink-900/10",
     items: [
-      { url: "https://instalacion-dimensiones.vercel.app", label: "Dimensiones" },
-      { url: "https://aura-scanner-bice.vercel.app", label: "Aura Scanner" },
-      { url: "https://kinetic-poiesis.vercel.app", label: "Kinetic Poiesis" },
-      { url: "https://audioreactive-visualizer.vercel.app", label: "Audioreactive" },
-      { url: "https://quantum-looper.netlify.app", label: "Quantum Looper" },
-      { url: "https://circulo-de-quintas-one.vercel.app", label: "Círculo de Quintas" },
+      { url: "https://instalacion-dimensiones.vercel.app", label: "Dimensiones", image: "/Dimensiones-preview.webp" },
+      { url: "https://aura-scanner-bice.vercel.app", label: "Aura Scanner", image: "/aura-scanner-screenshot-preview.webp" },
+      { url: "https://kinetic-poiesis.vercel.app", label: "Kinetic Poiesis", image: "/kinetic-poiesis-front.webp" },
+      { url: "https://audioreactive-visualizer.vercel.app", label: "Audioreactive", image: "/audioreactive-preview.webp" },
+      { url: "https://quantum-looper.netlify.app", label: "Quantum Looper", image: "/quantum-looper-front.webp" },
+      { url: "https://circulo-de-quintas-one.vercel.app", label: "Circulo de Quintas", image: "/circulo-de-quintas-front.webp" },
     ],
   },
   {
@@ -80,9 +83,9 @@ const categories: Category[] = [
     emoji: "🎮",
     color: "from-purple-500/20 to-purple-900/10",
     items: [
-      { url: "https://la-reta.vercel.app", label: "La Reta" },
-      { url: "https://guardabosques.vercel.app", label: "Guardabosques" },
-      { url: "https://mariachi-vs-inflation.vercel.app", label: "Mariachi vs Inflation" },
+      { url: "https://la-reta.vercel.app", label: "La Reta", image: "/la-reta-front.webp" },
+      { url: "https://guardabosques.vercel.app", label: "Guardabosques", image: "/guardabosques-front.webp" },
+      { url: "https://mariachi-vs-inflation.vercel.app", label: "Mariachi vs Inflation", image: "/mariachi-vs-inflation-front.webp" },
     ],
   },
   {
@@ -91,8 +94,8 @@ const categories: Category[] = [
     emoji: "⚖️",
     color: "from-orange-500/20 to-orange-900/10",
     items: [
-      { url: "https://orien-wine.vercel.app/", label: "Orien" },
-      { url: "https://bnb-research-commons-five.vercel.app", label: "BNB Research Commons" },
+      { url: "https://orien-wine.vercel.app", label: "Orien", image: "/orien-front.webp" },
+      { url: "https://bnb-research-commons-five.vercel.app", label: "BNB Research Commons", image: "/bnb-research-commons-front.webp" },
     ],
   },
   {
@@ -101,31 +104,13 @@ const categories: Category[] = [
     emoji: "🛠️",
     color: "from-cyan-500/20 to-cyan-900/10",
     items: [
-      { url: "https://bitacora-pearl.vercel.app/", label: "Bitácora" },
-      { url: "https://orden-os.vercel.app/", label: "OrdenOS" },
+      { url: "https://taak-crm.vercel.app", label: "TAAK CRM", image: "/taak-crm-front.webp" },
+      { url: "https://nexus-topaz-theta.vercel.app", label: "Nexus", image: "/nexus-front.webp" },
+      { url: "https://bitacora-pearl.vercel.app", label: "Bitacora", image: "/bitacora-front.webp" },
+      { url: "https://orden-os.vercel.app", label: "OrdenOS", image: "/ordenos-front.webp" },
     ],
   },
 ];
-
-function getScreenshotUrl(url: string): string {
-  // Manual fallback for pages that don't render well in headless browsers
-  const manualScreenshots: Record<string, string> = {
-    "https://care-pilot-nu.vercel.app": "/care-pilot-screenshot.png",
-    "https://arvi-eight.vercel.app": "/arvi-screenshot.png",
-    "https://aura-tau-five.vercel.app": "/aura-screenshot.png",
-    "https://aura-scanner-bice.vercel.app": "/aura-scanner-screenshot.png",
-    "https://rls-jerusalem-336-ivory.vercel.app": "/rls-jerusalem-screenshot.png",
-    "https://inland-mex.vercel.app": "/inlandmex.png",
-    "https://kan-tasejkan.vercel.app": "/kan-kasejtan.png",
-    "https://instalacion-dimensiones.vercel.app": "/Dimensiones.png",
-  };
-
-  // Check if we have a manual screenshot for this URL
-  const match = Object.keys(manualScreenshots).find((key) => url.startsWith(key));
-  if (match) return manualScreenshots[match];
-
-  return `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url`;
-}
 
 export default function PortfolioSection() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -192,7 +177,7 @@ export default function PortfolioSection() {
                     {/* Screenshot */}
                     <div className="w-full h-32 bg-gray-900/50 overflow-hidden">
                       <img
-                        src={getScreenshotUrl(item.url)}
+                        src={item.image}
                         alt={item.label}
                         className="w-full h-full object-cover object-top opacity-90 group-hover:opacity-100 transition-opacity"
                         loading="lazy"

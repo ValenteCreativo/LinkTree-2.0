@@ -34,7 +34,7 @@ const iconMap = {
 const profile = {
   avatar: "/foto-vale2026.png",
   title: "Valentín Martínez",
-  banner: "Technology Developer for Social & Environmental Impact",
+  banner: "Developer · Artist · Strategist",
   links: [
     { title: "TA'AK Studio", url: "http://taak-studio.cc/" },
     { title: "GitHub", url: "https://github.com/ValenteCreativo" },

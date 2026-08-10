@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Valentín Martínez | Technology Developer",
   description:
-    "Technology developer for social & environmental impact. Portfolio, links y contacto.",
+    "Developer · Artist · Strategist. Portfolio, links y contacto.",
   icons: {
     icon: "/favicon-vale.png",
     apple: "/favicon-vale.png",
