@@ -240,7 +240,7 @@ export default function Home() {
           }}
         >
           <img
-            src="/BG-linktree (1).png"
+            src="/bg-linktree.webp"
             alt="Background"
             className="w-full h-full object-cover"
           />
