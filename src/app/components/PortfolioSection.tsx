@@ -25,7 +25,6 @@ const categories: Category[] = [
     color: "from-amber-500/20 to-amber-900/10",
     items: [
       { url: "https://maestria-culinaria-fast.vercel.app", label: "Maestría Culinaria", image: "/maestria-culinaria-screenshot.webp" },
-      { url: "https://ecotourmex.vercel.app", label: "Ecotourmex", image: "/ecotour-screenshot.webp" },
       { url: "https://kostik.mx", label: "Kostik", image: "/kostik-screenshot.webp" },
       { url: "https://inland-mex.vercel.app", label: "Inland Mex", image: "/inlandmex-preview.webp" },
       { url: "https://kan-tasejkan.vercel.app", label: "Kan Tasejkan", image: "/kan-kasejtan-preview.webp" },
