@@ -24,6 +24,7 @@ const categories: Category[] = [
     emoji: "💼",
     color: "from-amber-500/20 to-amber-900/10",
     items: [
+      { url: "https://www.conspireinspire.com/", label: "Conspira", image: "/conspira-screenshot.webp" },
       { url: "https://www.alaraiz.mx/", label: "A la Raíz", image: "/alaraiz-screenshot.webp" },
       { url: "https://asterstudios.mx/", label: "Aster Studios", image: "/aster-studios-screenshot.webp" },
       { url: "https://maestria-culinaria-fast.vercel.app", label: "Maestría Culinaria", image: "/maestria-culinaria-screenshot.webp" },
@@ -56,6 +57,7 @@ const categories: Category[] = [
     emoji: "🤝",
     color: "from-blue-500/20 to-blue-900/10",
     items: [
+      { url: "https://carepilot2.vercel.app/", label: "CarePilot (2)", image: "/carepilot-2-screenshot.webp" },
       { url: "https://care-pilot-nu.vercel.app", label: "CarePilot", image: "/care-pilot-screenshot-preview.webp" },
       { url: "https://seedr-three.vercel.app", label: "Seedr", image: "/seedr-front.webp" },
       { url: "https://www.side-b.art", label: "Side-B", image: "/side-b-front.webp" },
@@ -105,6 +107,8 @@ const categories: Category[] = [
     emoji: "🛠️",
     color: "from-cyan-500/20 to-cyan-900/10",
     items: [
+      { url: "https://retas-five.vercel.app/", label: "Retas", image: "/retas-screenshot.webp" },
+      { url: "https://pulse-livid-mu.vercel.app/", label: "Pulse", image: "/pulse-screenshot.webp" },
       { url: "https://pivot-one-tau.vercel.app/", label: "PIVOT!", image: "/pivot-screenshot.webp" },
       { url: "https://mesh402.onrender.com/", label: "Mesh402", image: "/mesh402-screenshot.webp" },
       { url: "https://taak-crm.vercel.app", label: "TAAK CRM", image: "/taak-crm-front.webp" },
