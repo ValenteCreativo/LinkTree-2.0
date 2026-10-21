@@ -24,7 +24,7 @@ const categories: Category[] = [
     emoji: "💼",
     color: "from-amber-500/20 to-amber-900/10",
     items: [
-      { url: "https://www.conspireinspire.com/", label: "Conspira", image: "/conspira-screenshot.webp" },
+      { url: "https://www.conspireinspire.com/", label: "CoInspira", image: "/conspira-screenshot.webp" },
       { url: "https://www.alaraiz.mx/", label: "A la Raíz", image: "/alaraiz-screenshot.webp" },
       { url: "https://asterstudios.mx/", label: "Aster Studios", image: "/aster-studios-screenshot.webp" },
       { url: "https://maestria-culinaria-fast.vercel.app", label: "Maestría Culinaria", image: "/maestria-culinaria-screenshot.webp" },
